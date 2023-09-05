@@ -15,5 +15,7 @@
     "require": {
         "psr/container": "^2.0",
         "symfony/yaml": "^6.3"
-    }
+    },
+    "version": "1.0.0",
+    "license": "GPL-3.0-or-later"
 }
