@@ -1,0 +1,19 @@
+{
+    "name": "dannyxcii/routing-component",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "DannyXCII\\RoutingComponent\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Daniel Winning",
+            "email": "daniel@winningwebdesign.co.uk"
+        }
+    ],
+    "require": {
+        "psr/container": "^2.0",
+        "symfony/yaml": "^6.3"
+    }
+}
