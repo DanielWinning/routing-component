@@ -18,7 +18,8 @@ composer require dannyxcii/routing-component
 
 #### Create a Router Instance
 
-Create an instance of the Router class, passing a dependency injection container that implements the Psr\Container\ContainerInterface:
+Create an instance of the `Router` class, passing a dependency injection container that implements the 
+`Psr\Container\ContainerInterface`:
 
 ```php
 use DannyXCII\RoutingComponent\Router;
@@ -49,7 +50,7 @@ routes:
   
 #### Handle Requests:
 
-In your application's entry point (e.g., index.php), call the handleRequest method to handle incoming HTTP requests:
+In your application's entry point (e.g., `index.php`), call the `handleRequest` method to handle incoming HTTP requests:
 
 ```php
 $requestUri = $_SERVER['REQUEST_URI'];
