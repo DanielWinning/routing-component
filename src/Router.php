@@ -40,15 +40,32 @@ class Router {
     public function handleRequest(string $requestUri): void
     {
         foreach ($this->routes as $route) {
-            if (preg_match("#^{$route['path']}$#", $requestUri, $matches)) {
+            $pattern = $this->generateRoutePattern($route['path']);
+
+            if (preg_match($pattern, $requestUri, $matches)) {
                 array_shift($matches); // Remove the full match
                 $this->callHandler($route['handler'], $matches);
                 return;
             }
         }
+
         // Handle 404 Not Found
         header("HTTP/1.0 404 Not Found");
         echo "404 Not Found";
+    }
+
+    /**
+     * @param string $routePath
+     *
+     * @return string
+     */
+    private function generateRoutePattern(string $routePath): string
+    {
+        $routePath = preg_replace_callback('/{([^}]+)}/', function ($matches) {
+            return '(?P<' . $matches[1] . '>[^/]+)';
+        }, $routePath);
+
+        return "#^{$routePath}$#";
     }
 
     /**
