@@ -3,7 +3,8 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "DannyXCII\\RoutingComponent\\": "src/"
+            "DannyXCII\\RoutingComponent\\": "src/",
+            "DannyXCII\\RoutingComponentTests\\": "tests/"
         }
     },
     "authors": [

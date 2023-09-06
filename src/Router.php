@@ -50,8 +50,7 @@ class Router {
             }
         }
 
-        // Handle 404 Not Found
-        header("HTTP/1.0 404 Not Found");
+        header("HTTP/1.1 404 Not Found");
         echo "404 Not Found";
     }
 
@@ -93,13 +92,27 @@ class Router {
                 $dependencies = $this->resolveDependencies($constructor, $this->container);
                 $controller = $reflection->newInstanceArgs($dependencies);
             } else {
-                $controller = new $controllerClass();
+                $controller = $this->createControllerInstance($controllerClass);
             }
 
             if (method_exists($controller, $methodName)) {
                 $this->invokeControllerMethod($controller, $methodName, $matches);
             }
         }
+    }
+
+    /**
+     * @param mixed $controller
+     *
+     * @return mixed
+     */
+    public function createControllerInstance(mixed $controller): object
+    {
+        if (is_string($controller)) {
+            return new $controller();
+        }
+
+        return $controller;
     }
 
     /**
@@ -151,5 +164,15 @@ class Router {
     public function getRoutes(): array
     {
         return $this->routes;
+    }
+
+    /**
+     * @param array $routes
+     *
+     * @return void
+     */
+    public function loadRoutes(array $routes): void
+    {
+        $this->routes = $routes;
     }
 }
