@@ -66,14 +66,14 @@ class RouterTest extends TestCase
      *
      * @throws MockObjectException
      */
-//    public function testHandleRequestDynamicMatchingRoute(): void
-//    {
-//        [$router, $testController] = $this->configure();
-//
-//        $testController->expects($this->once())->method('test_4')->with([['id' => '123']]);
-//
-//        $router->handleRequest('/test/blog/123');
-//    }
+    public function testHandleRequestDynamicMatchingRoute(): void
+    {
+        [$router, $testController] = $this->configure();
+
+        $testController->expects($this->once())->method('test_4')->with('123');
+
+        $router->handleRequest('/test/blog/123');
+    }
 
     /**
      * @return void
