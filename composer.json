@@ -1,5 +1,6 @@
 {
     "name": "dannyxcii/routing-component",
+    "description": "A dynamic PHP Routing Component",
     "type": "library",
     "autoload": {
         "psr-4": {
