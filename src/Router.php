@@ -187,12 +187,17 @@ class Router {
         }
 
         if (is_string($result)) {
+            $stream = new Stream(fopen('php://temp', 'r+'));
+            $stream->write($result);
+            $stream->rewind();
+
             return new Response(
                 200,
                 'OK',
                 [
                     'Content-Type' => 'text/html',
-                ]
+                ],
+                $stream
             );
         }
 
