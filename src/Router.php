@@ -3,6 +3,7 @@
 namespace DannyXCII\RoutingComponent;
 
 use DannyXCII\HttpComponent\Response;
+use DannyXCII\HttpComponent\Stream;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -111,12 +112,16 @@ class Router {
      */
     private function notFoundResponse(): ResponseInterface
     {
+        $stream = new Stream(fopen('php://temp', 'r+'));
+        $stream->write('404 Not Found');
+
         return new Response(
             404,
             'Not Found',
             [
                 'Content-Type' => 'text/html',
-            ]
+            ],
+            $stream
         );
     }
 
