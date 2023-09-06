@@ -2,7 +2,10 @@
 
 namespace DannyXCII\RoutingComponent;
 
+use DannyXCII\HttpComponent\Response;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class Router {
@@ -31,15 +34,15 @@ class Router {
     }
 
     /**
-     * @param string $requestUri
+     * @param RequestInterface $request
      *
      * @return void
      *
      * @throws \ReflectionException|\Exception|\Throwable
      */
-    public function handleRequest(string $requestUri): void
+    public function handleRequest(RequestInterface $request): ResponseInterface
     {
-        $requestPath = rtrim(strtok($requestUri, '?'), '/');
+        $requestPath = rtrim(strtok($request->getUri()->getPath(), '?'), '/');
 
         foreach ($this->routes as $route) {
             $pattern = $this->generateRoutePattern($route['path']);
@@ -47,13 +50,11 @@ class Router {
             if (preg_match($pattern, $requestPath, $matches)) {
                 array_shift($matches);
                 array_pop($matches);
-                $this->callHandler($route['handler'], $matches);
-                return;
+                return $this->callHandler($route['handler'], $matches);
             }
         }
 
-        header("HTTP/1.1 404 Not Found");
-        echo "404 Not Found";
+        return $this->notFoundResponse();
     }
 
     /**
@@ -74,11 +75,11 @@ class Router {
      * @param array $handler
      * @param array $matches
      *
-     * @return void
+     * @return ResponseInterface
      *
      * @throws \ReflectionException|\Exception|\Throwable
      */
-    private function callHandler(array $handler, array $matches): void
+    private function callHandler(array $handler, array $matches): ResponseInterface
     {
         if (count($handler) !== 2) {
             throw new \RuntimeException('Invalid handler format');
@@ -98,9 +99,25 @@ class Router {
             }
 
             if (method_exists($controller, $methodName)) {
-                $this->invokeControllerMethod($controller, $methodName, $matches);
+                return $this->invokeControllerMethod($controller, $methodName, $matches);
             }
         }
+
+        return $this->notFoundResponse();
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    private function notFoundResponse(): ResponseInterface
+    {
+        return new Response(
+            404,
+            'Not Found',
+            [
+                'Content-Type' => 'text/html',
+            ]
+        );
     }
 
     /**
@@ -153,11 +170,27 @@ class Router {
      * @param string $methodName
      * @param array $matches
      *
-     * @return void
+     * @return ResponseInterface
      */
-    private function invokeControllerMethod($controller, string $methodName, array $matches): void
+    private function invokeControllerMethod($controller, string $methodName, array $matches): ResponseInterface
     {
-        call_user_func_array([$controller, $methodName], $matches);
+        $result = call_user_func_array([$controller, $methodName], $matches);
+
+        if ($result instanceof ResponseInterface) {
+            return $result;
+        }
+
+        if (is_string($result)) {
+            return new Response(
+                200,
+                'OK',
+                [
+                    'Content-Type' => 'text/html',
+                ]
+            );
+        }
+
+        return $this->notFoundResponse();
     }
 
     /**

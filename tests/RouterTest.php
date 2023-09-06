@@ -2,10 +2,14 @@
 
 namespace DannyXCII\RoutingComponentTests;
 
+use DannyXCII\HttpComponent\Request;
+use DannyXCII\HttpComponent\URI;
 use DannyXCII\RoutingComponent\Router;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class RouterTest extends TestCase
@@ -58,7 +62,9 @@ class RouterTest extends TestCase
             ->method($methodName)
             ->with([]);
 
-        $router->handleRequest($path);
+        $uri = $this->buildUri($path, '');
+
+        $router->handleRequest($this->buildGetRequest($uri));
     }
 
     /**
@@ -72,7 +78,9 @@ class RouterTest extends TestCase
 
         $testController->expects($this->once())->method('test_4')->with('123');
 
-        $router->handleRequest('/test/blog/123');
+        $uri = $this->buildUri('/test/blog/123', '');
+
+        $router->handleRequest($this->buildGetRequest($uri));
     }
 
     /**
@@ -89,7 +97,9 @@ class RouterTest extends TestCase
             ->method('test_1')
             ->with([]);
 
-        $router->handleRequest('/test?var=1');
+        $uri = $this->buildUri('/test', 'var=1');
+
+        $router->handleRequest($this->buildGetRequest($uri));
     }
 
     /**
@@ -104,9 +114,31 @@ class RouterTest extends TestCase
         $testController->expects($this->never())
             ->method($this->anything());
 
-        $this->expectOutputString('404 Not Found');
+        $uri = $this->buildUri('/not-existing', '');
+        $response = $router->handleRequest($this->buildGetRequest($uri));
 
-        $router->handleRequest('/not-existing');
+        $this->assertEquals(404, $response->getStatusCode());
+    }
+
+    /**
+     * @param string $path
+     * @param string $query
+     *
+     * @return UriInterface
+     */
+    private function buildUri(string $path, string $query): UriInterface
+    {
+        return new URI('https', 'localhost', $path, $query);
+    }
+
+    /**
+     * @param UriInterface $uri
+     *
+     * @return RequestInterface
+     */
+    private function buildGetRequest(UriInterface $uri): RequestInterface
+    {
+        return new Request('GET', $uri, ['Content-Type' => 'text/html']);
     }
 
     /**

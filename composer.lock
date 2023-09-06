@@ -4,8 +4,49 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "787eec170262c2100a3d9755c42e284c",
+    "content-hash": "acafd90d4f36ae35e8cd9579dc7f23fb",
     "packages": [
+        {
+            "name": "dannyxcii/http-component",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DanielWinning/http-component.git",
+                "reference": "ab47b9bb9da86f166b890c02912def030d38d525"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DanielWinning/http-component/zipball/ab47b9bb9da86f166b890c02912def030d38d525",
+                "reference": "ab47b9bb9da86f166b890c02912def030d38d525",
+                "shasum": ""
+            },
+            "require": {
+                "psr/http-message": "^2.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DannyXCII\\HttpComponent\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Winning",
+                    "email": "daniel@winningsoftware.co.uk"
+                }
+            ],
+            "description": "A component for handling HTTP Requests/Responses",
+            "support": {
+                "issues": "https://github.com/DanielWinning/http-component/issues",
+                "source": "https://github.com/DanielWinning/http-component/tree/main"
+            },
+            "time": "2023-09-06T16:45:12+00:00"
+        },
         {
             "name": "psr/container",
             "version": "2.0.2",
@@ -58,6 +99,59 @@
                 "source": "https://github.com/php-fig/container/tree/2.0.2"
             },
             "time": "2021-11-05T16:47:00+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/http-message/tree/2.0"
+            },
+            "time": "2023-04-04T09:54:51+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -1897,7 +1991,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "dannyxcii/http-component": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
