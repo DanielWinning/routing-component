@@ -144,4 +144,12 @@ class Router {
     {
         call_user_func_array([$controller, $methodName], $matches);
     }
+
+    /**
+     * @return array
+     */
+    public function getRoutes(): array
+    {
+        return $this->routes;
+    }
 }
