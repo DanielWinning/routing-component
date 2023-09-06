@@ -114,6 +114,7 @@ class Router {
     {
         $stream = new Stream(fopen('php://temp', 'r+'));
         $stream->write('404 Not Found');
+        $stream->rewind();
 
         return new Response(
             404,
