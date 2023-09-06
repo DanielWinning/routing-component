@@ -43,7 +43,8 @@ class Router {
             $pattern = $this->generateRoutePattern($route['path']);
 
             if (preg_match($pattern, $requestUri, $matches)) {
-                array_shift($matches); // Remove the full match
+                array_shift($matches);
+                array_pop($matches);
                 $this->callHandler($route['handler'], $matches);
                 return;
             }
