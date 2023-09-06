@@ -39,10 +39,12 @@ class Router {
      */
     public function handleRequest(string $requestUri): void
     {
+        $requestPath = rtrim(strtok($requestUri, '?'), '/');
+
         foreach ($this->routes as $route) {
             $pattern = $this->generateRoutePattern($route['path']);
 
-            if (preg_match($pattern, $requestUri, $matches)) {
+            if (preg_match($pattern, $requestPath, $matches)) {
                 array_shift($matches);
                 array_pop($matches);
                 $this->callHandler($route['handler'], $matches);

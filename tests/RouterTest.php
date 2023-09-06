@@ -80,6 +80,23 @@ class RouterTest extends TestCase
      *
      * @throws MockObjectException
      */
+    public function testHandleRequestWithQueryString(): void
+    {
+        // Ideally we don't want the query string passed to our handleRequest, but check it does not interfere
+        [$router, $testController] = $this->configure();
+
+        $testController->expects($this->once())
+            ->method('test_1')
+            ->with([]);
+
+        $router->handleRequest('/test?var=1');
+    }
+
+    /**
+     * @return void
+     *
+     * @throws MockObjectException
+     */
     public function testHandleRequestNoMatchingRoute(): void
     {
         [$router, $testController] = $this->configure();
@@ -160,6 +177,7 @@ class RouterTest extends TestCase
         return [
             ['test_1', '/test'],
             ['test_2', '/test/second'],
+            ['test_1', '/test/'],
         ];
     }
 }
