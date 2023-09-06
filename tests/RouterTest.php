@@ -90,7 +90,6 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestWithQueryString(): void
     {
-        // Ideally we don't want the query string passed to our handleRequest, but check it does not interfere
         [$router, $testController] = $this->configure();
 
         $testController->expects($this->once())
