@@ -47,15 +47,40 @@ routes:
     path: /user/{id}
     handler: [App\Controllers\UserController, show]
 ```
+
+Alternatively, you can load your routes from an array if you'd prefer:
+
+```php
+$routes = [
+    [
+        'path' => '/',
+        'handler' => [
+            'App\\Controllers\\HomeController',
+            'index',
+        ]       
+    ],
+    [
+        'path' => '/user/{id}',
+        'handler' => [
+            'App\\Controllers\\UserController',
+            'show',
+        ]       
+    ],
+];
+
+$router->loadRoutes($routes);
+```
   
 #### Handle Requests:
 
 In your application's entry point (e.g., `index.php`), call the `handleRequest` method to handle incoming HTTP requests:
 
 ```php
-$requestUri = $_SERVER['REQUEST_URI'];
-$router->handleRequest($requestUri);
+$router->handleRequest($request);
 ```
+
+The `handleRequest` method expects an instance of `Psr\Http\Message\RequestInterface`. This Routing Component requires my
+HTTP Component, therefore `Request` and `Response` classes are already provided.
 
 The router will match the request URI to the defined routes and execute the corresponding controller action.
 
@@ -63,14 +88,14 @@ The router will match the request URI to the defined routes and execute the corr
 
 Controller actions are defined as arrays containing the controller class name and the method name:
 
-```php
+```yaml
 ['App\Controllers\HomeController', 'index']
 ```
 
 ### Dependencies
-The `Router` class can work seamlessly with dependency injection containers. You can inject dependencies into your 
-controller actions through constructor injection. When a controller is instantiated, the router will automatically 
-resolve and inject its dependencies from the container.
+The `Router` class is designed to work seamlessly with dependency injection containers. You can inject dependencies 
+into your controller actions through constructor injection. When a controller is instantiated, the router will automatically 
+resolve and inject its dependencies from the container. Requires a PSR-11 compliant `ContainerInterface` instance.
 
 ### Error Handling
 The router handles 404 Not Found errors for unhandled routes. If no matching route is found, it will respond with a 
