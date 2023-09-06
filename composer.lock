@@ -4,26 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "acafd90d4f36ae35e8cd9579dc7f23fb",
+    "content-hash": "d845479d1f963d183aa975bdd048e8f6",
     "packages": [
         {
             "name": "dannyxcii/http-component",
-            "version": "dev-main",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DanielWinning/http-component.git",
-                "reference": "ab47b9bb9da86f166b890c02912def030d38d525"
+                "reference": "59f52f5f13f2072fff668e8c3be16b77d525c47e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DanielWinning/http-component/zipball/ab47b9bb9da86f166b890c02912def030d38d525",
-                "reference": "ab47b9bb9da86f166b890c02912def030d38d525",
+                "url": "https://api.github.com/repos/DanielWinning/http-component/zipball/59f52f5f13f2072fff668e8c3be16b77d525c47e",
+                "reference": "59f52f5f13f2072fff668e8c3be16b77d525c47e",
                 "shasum": ""
             },
             "require": {
                 "psr/http-message": "^2.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -43,9 +42,9 @@
             "description": "A component for handling HTTP Requests/Responses",
             "support": {
                 "issues": "https://github.com/DanielWinning/http-component/issues",
-                "source": "https://github.com/DanielWinning/http-component/tree/main"
+                "source": "https://github.com/DanielWinning/http-component/tree/1.0.0"
             },
-            "time": "2023-09-06T16:45:12+00:00"
+            "time": "2023-09-06T18:54:08+00:00"
         },
         {
             "name": "psr/container",
@@ -1991,9 +1990,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "dannyxcii/http-component": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
