@@ -4,29 +4,35 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d845479d1f963d183aa975bdd048e8f6",
+    "content-hash": "223f56b99f3e286f9e709fd567845d59",
     "packages": [
         {
             "name": "dannyxcii/http-component",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DanielWinning/http-component.git",
-                "reference": "59f52f5f13f2072fff668e8c3be16b77d525c47e"
+                "reference": "82bca841413fea38676dc9ef63c402b9e1795fdb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DanielWinning/http-component/zipball/59f52f5f13f2072fff668e8c3be16b77d525c47e",
-                "reference": "59f52f5f13f2072fff668e8c3be16b77d525c47e",
+                "url": "https://api.github.com/repos/DanielWinning/http-component/zipball/82bca841413fea38676dc9ef63c402b9e1795fdb",
+                "reference": "82bca841413fea38676dc9ef63c402b9e1795fdb",
                 "shasum": ""
             },
             "require": {
+                "ext-curl": "*",
+                "psr/http-client": "^1.0",
                 "psr/http-message": "^2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.3"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "DannyXCII\\HttpComponent\\": "src/"
+                    "DannyXCII\\HttpComponent\\": "src/",
+                    "DannyXCII\\HttpComponentTests\\": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -42,9 +48,9 @@
             "description": "A component for handling HTTP Requests/Responses",
             "support": {
                 "issues": "https://github.com/DanielWinning/http-component/issues",
-                "source": "https://github.com/DanielWinning/http-component/tree/1.0.0"
+                "source": "https://github.com/DanielWinning/http-component/tree/2.0.0"
             },
-            "time": "2023-09-06T18:54:08+00:00"
+            "time": "2023-09-07T21:54:45+00:00"
         },
         {
             "name": "psr/container",
@@ -98,6 +104,58 @@
                 "source": "https://github.com/php-fig/container/tree/2.0.2"
             },
             "time": "2021-11-05T16:47:00+00:00"
+        },
+        {
+            "name": "psr/http-client",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-client.git",
+                "reference": "0955afe48220520692d2d09f7ab7e0f93ffd6a31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/0955afe48220520692d2d09f7ab7e0f93ffd6a31",
+                "reference": "0955afe48220520692d2d09f7ab7e0f93ffd6a31",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0 || ^8.0",
+                "psr/http-message": "^1.0 || ^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP clients",
+            "homepage": "https://github.com/php-fig/http-client",
+            "keywords": [
+                "http",
+                "http-client",
+                "psr",
+                "psr-18"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/http-client/tree/1.0.2"
+            },
+            "time": "2023-04-10T20:12:12+00:00"
         },
         {
             "name": "psr/http-message",
