@@ -170,6 +170,13 @@ class RouterTest extends TestCase
     {
         return [
             [
+                'path' => '/',
+                'handler' => [
+                    TestController::class,
+                    'test_index',
+                ],
+            ],
+            [
                 'path' => '/test',
                 'handler' => [
                     TestController::class,
@@ -206,9 +213,10 @@ class RouterTest extends TestCase
     public static function routeTestCaseProvider(): array
     {
         return [
-            ['test_1', '/test'],
-            ['test_2', '/test/second'],
-            ['test_1', '/test/'],
+            '/' => ['test_index', '/'],
+            '/test' => ['test_1', '/test'],
+            '/test/second' => ['test_2', '/test/second'],
+            '/test/' => ['test_1', '/test/'],
         ];
     }
 }

@@ -37,13 +37,14 @@ class Router {
     /**
      * @param RequestInterface $request
      *
-     * @return void
+     * @return ResponseInterface
      *
      * @throws \ReflectionException|\Exception|\Throwable
      */
     public function handleRequest(RequestInterface $request): ResponseInterface
     {
-        $requestPath = rtrim(strtok($request->getUri()->getPath(), '?'), '/');
+        $requestPath = strtok($request->getUri()->getPath(), '?');
+        $requestPath = $requestPath === '/' ? $requestPath : rtrim($requestPath, '/');
 
         foreach ($this->routes as $route) {
             $pattern = $this->generateRoutePattern($route['path']);
@@ -151,6 +152,7 @@ class Router {
     private function resolveDependencies(\ReflectionMethod $constructor, ContainerInterface $container): array
     {
         $dependencies = [];
+
         foreach ($constructor->getParameters() as $parameter) {
             $paramType = $parameter->getType();
 
@@ -159,12 +161,12 @@ class Router {
                 $dependency = $container->get($dependencyName);
 
                 if (!$dependency) {
-                    throw new \RuntimeException("Dependency not found: $dependencyName");
+                    throw new \RuntimeException(sprintf('Dependency not found: %s', $dependencyName));
                 }
 
                 $dependencies[] = $dependency;
             } else {
-                throw new \RuntimeException("Unsupported parameter type: " . $parameter->getName());
+                throw new \RuntimeException(sprintf('Unsupported parameter type: %s', $parameter->getName()));
             }
         }
 
@@ -195,7 +197,10 @@ class Router {
                 200,
                 'OK',
                 [
-                    'Content-Type' => 'text/html',
+                    'Content-Type' => [
+                        'text/html',
+                        'application/json',
+                    ],
                 ],
                 $stream
             );
