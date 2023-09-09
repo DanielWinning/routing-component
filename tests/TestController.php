@@ -4,6 +4,11 @@ namespace DannyXCII\RoutingComponentTests;
 
 class TestController
 {
+    public function test_index(array $matches = []): ?string
+    {
+        return null;
+    }
+
     public function test_1(array $matches = []): ?string
     {
         return null;
@@ -22,5 +27,10 @@ class TestController
     public function test_4(string $id): ?string
     {
         return $id;
+    }
+
+    public function test_5(string $category, string $id): ?string
+    {
+        return sprintf('Category: %s | Post ID: %s', $category, $id);
     }
 }
