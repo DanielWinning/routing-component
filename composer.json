@@ -18,7 +18,7 @@
         "psr/container": "^2.0",
         "symfony/yaml": "^6.3",
         "psr/http-message": "^2.0",
-        "dannyxcii/http-component": "dev-main"
+        "dannyxcii/http-component": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.3"
