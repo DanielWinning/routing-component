@@ -68,17 +68,23 @@ class RouterTest extends TestCase
     }
 
     /**
+     * @param string $path
+     * @param string $method
+     * @param array $args
+     *
+     * @dataProvider dynamicRouteTestCaseProvider
+     *
      * @return void
      *
      * @throws MockObjectException
      */
-    public function testHandleRequestDynamicMatchingRoute(): void
+    public function testHandleRequestDynamicMatchingRoute(string $path, string $method, array $args): void
     {
         [$router, $testController] = $this->configure();
 
-        $testController->expects($this->once())->method('test_4')->with('123');
+        $testController->expects($this->once())->method($method)->with(...$args);
 
-        $uri = $this->buildUri('/test/blog/123', '');
+        $uri = $this->buildUri($path, '');
 
         $router->handleRequest($this->buildGetRequest($uri));
     }
@@ -204,6 +210,13 @@ class RouterTest extends TestCase
                     'test_4',
                 ]
             ],
+            [
+                'path' => '/test/blog/{category}/{id}',
+                'handler' => [
+                    TestController::class,
+                    'test_5',
+                ],
+            ],
         ];
     }
 
@@ -217,6 +230,22 @@ class RouterTest extends TestCase
             '/test' => ['test_1', '/test'],
             '/test/second' => ['test_2', '/test/second'],
             '/test/' => ['test_1', '/test/'],
+        ];
+    }
+
+    public static function dynamicRouteTestCaseProvider(): array
+    {
+        return [
+            '/test/blog/{id}' => [
+                'path' => '/test/blog/123',
+                'method' => 'test_4',
+                'args' => ['123'],
+            ],
+            '/test/blog/{category}/{id}' => [
+                'path' => '/test/blog/recipes/1',
+                'method' => 'test_5',
+                'args' => ['recipes', '1'],
+            ],
         ];
     }
 }

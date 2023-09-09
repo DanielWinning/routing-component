@@ -51,7 +51,10 @@ class Router {
 
             if (preg_match($pattern, $requestPath, $matches)) {
                 array_shift($matches);
-                array_pop($matches);
+                $matches = array_filter($matches, function($val, $key) {
+                    return !is_numeric($key);
+                }, ARRAY_FILTER_USE_BOTH);
+
                 return $this->callHandler($route['handler'], $matches);
             }
         }

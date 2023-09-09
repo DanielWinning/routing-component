@@ -28,4 +28,9 @@ class TestController
     {
         return $id;
     }
+
+    public function test_5(string $category, string $id): ?string
+    {
+        return sprintf('Category: %s | Post ID: %s', $category, $id);
+    }
 }
