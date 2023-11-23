@@ -104,10 +104,7 @@ class RouterTest extends TestCase
         $uri = $this->buildUri('/not-existing-controller');
         $response = $this->router->handleRequest($this->buildGetRequest($uri));
 
-        $this->assertEquals(
-            404,
-            $response->getStatusCode()
-        );
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     /**
@@ -126,6 +123,7 @@ class RouterTest extends TestCase
     {
         $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri($path)));
         $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($return, $response->getBody()->getContents());
     }
 
     /**
@@ -139,6 +137,7 @@ class RouterTest extends TestCase
             $this->buildGetRequest($this->buildUri('/test', 'var=1'))
         );
         $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(TestController::STRING_RETURN, $response->getBody()->getContents());
     }
 
     /**
@@ -159,7 +158,7 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestMatchingInvalidControllerMethod(): void
     {
-        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/test_7')));
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/test_return_invalid_response')));
         $this->assertEquals(404, $response->getStatusCode());
     }
 
@@ -208,42 +207,42 @@ class RouterTest extends TestCase
                 'path' => '/',
                 'handler' => [
                     TestController::class,
-                    'test_index',
+                    'testIndex',
                 ],
             ],
             [
                 'path' => '/test',
                 'handler' => [
                     TestController::class,
-                    'test_1',
+                    'testIndex',
                 ],
             ],
             [
                 'path' => '/test/second',
                 'handler' => [
                     TestController::class,
-                    'test_2',
+                    'testIndex',
                 ],
             ],
             [
                 'path' => '/test/blog',
                 'handler' => [
                     TestController::class,
-                    'test_3',
+                    'testIndex',
                 ]
             ],
             [
                 'path' => '/test/blog/{id}',
                 'handler' => [
                     TestController::class,
-                    'test_4',
+                    'testParams',
                 ]
             ],
             [
                 'path' => '/test/blog/{category}/{id}',
                 'handler' => [
                     TestController::class,
-                    'test_5',
+                    'testMultipleParams',
                 ],
             ],
             [
@@ -260,17 +259,17 @@ class RouterTest extends TestCase
                 ],
             ],
             [
-                'path' => '/test_6',
+                'path' => '/test_return_response_class',
                 'handler' => [
                     TestController::class,
-                    'test_6',
+                    'testReturnResponseClass',
                 ],
             ],
             [
-                'path' => '/test_7',
+                'path' => '/test_return_invalid_response',
                 'handler' => [
                     TestController::class,
-                    'test_7',
+                    'testReturnInvalidResponse',
                 ],
             ],
         ];
@@ -283,28 +282,28 @@ class RouterTest extends TestCase
     {
         return [
             '/' => [
-                'test_index',
+                'testIndex',
                 '/',
                 TestController::STRING_RETURN,
-                ],
+            ],
             '/test' => [
-                'test_1',
+                'testIndex',
                 '/test',
                 TestController::STRING_RETURN,
-                ],
+            ],
             '/test/second' => [
-                'test_2',
+                'testIndex',
                 '/test/second',
                 TestController::STRING_RETURN,
             ],
             '/test/' => [
-                'test_1',
+                'testIndex',
                 '/test/',
                 TestController::STRING_RETURN,
             ],
             '/test_6' => [
-                'test_6',
-                '/test_6',
+                'testReturnResponseClass',
+                '/test_return_response_class',
                 'Test response',
             ],
         ];
@@ -318,13 +317,13 @@ class RouterTest extends TestCase
         return [
             '/test/blog/{id}' => [
                 'path' => '/test/blog/123',
-                'method' => 'test_4',
+                'method' => 'testParams',
                 'args' => ['123'],
                 'return' => '123',
             ],
             '/test/blog/{category}/{id}' => [
                 'path' => '/test/blog/recipes/1',
-                'method' => 'test_5',
+                'method' => 'testMultipleParams',
                 'args' => ['recipes', '1'],
                 'return' => 'Category: recipes | Post ID: 1',
             ],

@@ -133,17 +133,13 @@ class Router {
     }
 
     /**
-     * @param mixed $controller
+     * @param string $controller
      *
      * @return mixed
      */
-    public function createControllerInstance(mixed $controller): object
+    public function createControllerInstance(string $controller): object
     {
-        if (is_string($controller)) {
-            return new $controller();
-        }
-
-        return $controller;
+        return new $controller();
     }
 
     /**
