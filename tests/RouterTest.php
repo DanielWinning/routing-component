@@ -160,6 +160,46 @@ class RouterTest extends TestCase
     }
 
     /**
+     * @return void
+     *
+     * @throws \ReflectionException|\Throwable
+     */
+    public function testControllerHasInvalidParamType(): void
+    {
+        $this->router->loadRoutes([
+            [
+                'path' => '/',
+                'handler' => [
+                    TestControllerWithStringDependency::class,
+                    'testMethod'
+                ]
+            ]
+        ]);
+        $this->expectException(\RuntimeException::class);
+        $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws \ReflectionException|\Throwable
+     */
+    public function testControllerHasUndefinedDependency(): void
+    {
+        $this->router->loadRoutes([
+            [
+                'path' => '/',
+                'handler' => [
+                    TestControllerWithUndefinedDependency::class,
+                    'testMethod'
+                ]
+            ]
+        ]);
+        $this->expectException(\RuntimeException::class);
+        $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+    }
+
+    /**
      * @param string $path
      * @param string $query
      *
@@ -187,11 +227,14 @@ class RouterTest extends TestCase
      */
     private function configure(): Router
     {
+        $map = [
+            [UndefinedTestHelper::class, null],
+            [TestHelper::class, new TestHelper()],
+        ];
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())
             ->method('get')
-            ->with('DannyXCII\RoutingComponentTests\TestHelper')
-            ->willReturn(new TestHelper());
+            ->willReturnMap($map);
         $router = new Router($container);
         $router->loadRoutes($this->getTestRoutes());
 
