@@ -1,5 +1,14 @@
 # Routing Component Package
 
+<div>
+<!-- Version Badge -->
+<img src="https://img.shields.io/badge/Version-1.2.0-blue" alt="Version 1.2.0">
+<!-- PHP Coverage Badge -->
+<img src="https://img.shields.io/badge/PHP Coverage-56.67%25-red" alt="PHP Coverage 56.67%">
+<!-- License Badge -->
+<img src="https://img.shields.io/badge/License-GPL--3.0--or--later-34ad9b" alt="License GPL--3.0--or--later">
+</div>
+
 The Routing Component is a lightweight and flexible PHP package for handling routing in your web application. It 
 provides a simple way to define routes and execute controller actions based on incoming HTTP requests. This component 
 is designed to be easily integrated into your PHP projects and works seamlessly with PSR-11 compliant dependency 
