@@ -3,9 +3,12 @@
 namespace DannyXCII\RoutingComponentTests;
 
 use DannyXCII\HttpComponent\Request;
+use DannyXCII\HttpComponent\Response;
+use DannyXCII\HttpComponent\StreamBuilder;
 use DannyXCII\HttpComponent\URI;
 use DannyXCII\RoutingComponent\Router;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
@@ -16,6 +19,8 @@ class RouterTest extends TestCase
 {
     private ContainerInterface $container;
     private string $temporaryRoutesFilepath;
+    private Router $router;
+    private MockObject $testController;
 
     /**
      * @return void
@@ -31,6 +36,7 @@ class RouterTest extends TestCase
         }
 
         $this->container = $this->createMock(ContainerInterface::class);
+        [$this->router, $this->testController] = $this->configure();
     }
 
     /**
@@ -64,69 +70,50 @@ class RouterTest extends TestCase
     /**
      * @param string $methodName
      * @param string $path
-     *
-     * @dataProvider routeTestCaseProvider
+     * @param mixed $return
      *
      * @return void
      *
-     * @throws MockObjectException
+     * @throws \ReflectionException|\Throwable
+     *
+     * @dataProvider routeTestCaseProvider
      */
-    public function testHandleRequestMatchingRoute(string $methodName, string $path): void
+    public function testHandleRequestMatchingRoute(string $methodName, string $path, mixed $return): void
     {
-        [$router, $testController] = $this->configure();
-
-        $testController->expects($this->once())
+        $this->testController->expects($this->once())
             ->method($methodName)
-            ->with([]);
+            ->with([])
+            ->willReturn($return);
 
-        $uri = $this->buildUri($path);
-
-        $router->handleRequest($this->buildGetRequest($uri));
+        $request = $this->buildGetRequest($this->buildUri($path));
+        $response = $this->router->handleRequest($request);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
      * @return void
      *
-     * @throws MockObjectException
+     * @throws \ReflectionException|\Throwable
      */
     public function testHandleRequestWithInvalidHandlerDefinition(): void
     {
-        [$router, $testController] = $this->configure([
-            [
-                'path' => '/',
-                'handler' => [
-                    TestController::class,
-                ],
-            ],
-        ]);
-
-        $uri = $this->buildUri('/');
-
         $this->expectException(\RuntimeException::class);
-        $router->handleRequest($this->buildGetRequest($uri));
+        $this->router->handleRequest($this->buildGetRequest($this->buildUri('/invalid-handler')));
     }
 
     /**
      * @return void
      *
-     * @throws MockObjectException
+     * @throws \ReflectionException|\Throwable
      */
     public function testItReturnsNotFoundResponseWhenControllerDoesNotExist(): void
     {
-        [$router, $testController] = $this->configure([
-            [
-                'path' => '/',
-                'handler' => [
-                    'NotExistingController',
-                    'methodNotExists',
-                ],
-            ],
-        ]);
+        $uri = $this->buildUri('/not-existing-controller');
+        $response = $this->router->handleRequest($this->buildGetRequest($uri));
 
-        $uri = $this->buildUri('/');
         $this->assertEquals(
             404,
-            ($router->handleRequest($this->buildGetRequest($uri)))->getStatusCode()
+            $response->getStatusCode()
         );
     }
 
@@ -135,58 +122,63 @@ class RouterTest extends TestCase
      * @param string $method
      * @param array $args
      *
-     * @dataProvider dynamicRouteTestCaseProvider
-     *
      * @return void
      *
-     * @throws MockObjectException
+     * @throws \ReflectionException|\Throwable
+     *
+     * @dataProvider dynamicRouteTestCaseProvider
      */
-    public function testHandleRequestDynamicMatchingRoute(string $path, string $method, array $args): void
+    public function testHandleRequestDynamicMatchingRoute(string $path, string $method, array $args, mixed $return): void
     {
-        [$router, $testController] = $this->configure();
-
-        $testController->expects($this->once())
+        $this->testController->expects($this->once())
             ->method($method)
-            ->with(...$args);
-
-        $uri = $this->buildUri($path);
-
-        $router->handleRequest($this->buildGetRequest($uri));
+            ->with(...$args)
+            ->willReturn($return);
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri($path)));
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
      * @return void
      *
-     * @throws MockObjectException
+     * @throws \ReflectionException|\Throwable
      */
     public function testHandleRequestWithQueryString(): void
     {
-        [$router, $testController] = $this->configure();
-
-        $testController->expects($this->once())
+        $this->testController->expects($this->once())
             ->method('test_1')
-            ->with([]);
-
-        $uri = $this->buildUri('/test', 'var=1');
-
-        $router->handleRequest($this->buildGetRequest($uri));
+            ->with([])
+            ->willReturn(TestController::STRING_RETURN);
+        $response = $this->router->handleRequest(
+            $this->buildGetRequest($this->buildUri('/test', 'var=1'))
+        );
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
      * @return void
      *
-     * @throws MockObjectException
+     * @throws \ReflectionException|\Throwable
      */
     public function testHandleRequestNoMatchingRoute(): void
     {
-        [$router, $testController] = $this->configure();
-
-        $testController->expects($this->never())
+        $this->testController->expects($this->never())
             ->method($this->anything());
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/not-existing')));
+        $this->assertEquals(404, $response->getStatusCode());
+    }
 
-        $uri = $this->buildUri('/not-existing');
-        $response = $router->handleRequest($this->buildGetRequest($uri));
-
+    /**
+     * @return void
+     *
+     * @throws \ReflectionException|\Throwable
+     */
+    public function testHandleRequestMatchingInvalidControllerMethod(): void
+    {
+        $this->testController->expects($this->once())
+            ->method('test_7')->with([])
+            ->willReturn(null);
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/test_7')));
         $this->assertEquals(404, $response->getStatusCode());
     }
 
@@ -212,20 +204,18 @@ class RouterTest extends TestCase
     }
 
     /**
-     * @param array $routes
-     *
      * @return array
      *
      * @throws MockObjectException
      */
-    private function configure(array $routes = []): array
+    private function configure(): array
     {
         $router = $this->getMockBuilder(Router::class)
             ->setConstructorArgs([$this->container])
             ->onlyMethods(['createControllerInstance'])
             ->getMock();
 
-        $router->loadRoutes(!empty($routes) ? $routes : $this->getTestRoutes());
+        $router->loadRoutes($this->getTestRoutes());
         $testController = $this->createMock(TestController::class);
 
         $router->expects($this->any())
@@ -284,6 +274,33 @@ class RouterTest extends TestCase
                     'test_5',
                 ],
             ],
+            [
+                'path' => '/invalid-handler',
+                'handler' => [
+                    TestController::class,
+                ],
+            ],
+            [
+                'path' => '/not-existing-controller',
+                'handler' => [
+                    'NotExistingController',
+                    'methodNotExists',
+                ],
+            ],
+            [
+                'path' => '/test_6',
+                'handler' => [
+                    TestController::class,
+                    'test_6',
+                ],
+            ],
+            [
+                'path' => '/test_7',
+                'handler' => [
+                    TestController::class,
+                    'test_7',
+                ],
+            ],
         ];
     }
 
@@ -293,10 +310,31 @@ class RouterTest extends TestCase
     public static function routeTestCaseProvider(): array
     {
         return [
-            '/' => ['test_index', '/'],
-            '/test' => ['test_1', '/test'],
-            '/test/second' => ['test_2', '/test/second'],
-            '/test/' => ['test_1', '/test/'],
+            '/' => [
+                'test_index',
+                '/',
+                TestController::STRING_RETURN,
+                ],
+            '/test' => [
+                'test_1',
+                '/test',
+                TestController::STRING_RETURN,
+                ],
+            '/test/second' => [
+                'test_2',
+                '/test/second',
+                TestController::STRING_RETURN,
+            ],
+            '/test/' => [
+                'test_1',
+                '/test/',
+                TestController::STRING_RETURN,
+            ],
+            '/test_6' => [
+                'test_6',
+                '/test_6',
+                (new Response())->withStatus(200)->withBody(StreamBuilder::build('Test response')),
+            ],
         ];
     }
 
@@ -310,11 +348,13 @@ class RouterTest extends TestCase
                 'path' => '/test/blog/123',
                 'method' => 'test_4',
                 'args' => ['123'],
+                'return' => '123',
             ],
             '/test/blog/{category}/{id}' => [
                 'path' => '/test/blog/recipes/1',
                 'method' => 'test_5',
                 'args' => ['recipes', '1'],
+                'return' => 'Category: recipes | Post ID: 1',
             ],
         ];
     }
