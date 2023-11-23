@@ -6,7 +6,6 @@ use DannyXCII\HttpComponent\Request;
 use DannyXCII\HttpComponent\URI;
 use DannyXCII\RoutingComponent\Router;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
@@ -65,7 +64,6 @@ class RouterTest extends TestCase
     }
 
     /**
-     * @param string $methodName
      * @param string $path
      * @param mixed $return
      *
@@ -75,7 +73,7 @@ class RouterTest extends TestCase
      *
      * @dataProvider routeTestCaseProvider
      */
-    public function testHandleRequestMatchingRoute(string $methodName, string $path, mixed $return): void
+    public function testHandleRequestMatchingRoute(string $path, mixed $return): void
     {
         $request = $this->buildGetRequest($this->buildUri($path));
         $response = $this->router->handleRequest($request);
@@ -109,7 +107,6 @@ class RouterTest extends TestCase
 
     /**
      * @param string $path
-     * @param string $method
      * @param array $args
      * @param mixed $return
      *
@@ -119,7 +116,7 @@ class RouterTest extends TestCase
      *
      * @dataProvider dynamicRouteTestCaseProvider
      */
-    public function testHandleRequestDynamicMatchingRoute(string $path, string $method, array $args, mixed $return): void
+    public function testHandleRequestDynamicMatchingRoute(string $path, array $args, mixed $return): void
     {
         $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri($path)));
         $this->assertEquals(200, $response->getStatusCode());
@@ -191,6 +188,10 @@ class RouterTest extends TestCase
     private function configure(): Router
     {
         $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->any())
+            ->method('get')
+            ->with('DannyXCII\RoutingComponentTests\TestHelper')
+            ->willReturn(new TestHelper());
         $router = new Router($container);
         $router->loadRoutes($this->getTestRoutes());
 
@@ -272,6 +273,13 @@ class RouterTest extends TestCase
                     'testReturnInvalidResponse',
                 ],
             ],
+            [
+                'path' => '/depends',
+                'handler' => [
+                    TestControllerWithDependencies::class,
+                    'testMethodWithDependantController',
+                ],
+            ],
         ];
     }
 
@@ -282,29 +290,28 @@ class RouterTest extends TestCase
     {
         return [
             '/' => [
-                'testIndex',
                 '/',
                 TestController::STRING_RETURN,
             ],
             '/test' => [
-                'testIndex',
                 '/test',
                 TestController::STRING_RETURN,
             ],
             '/test/second' => [
-                'testIndex',
                 '/test/second',
                 TestController::STRING_RETURN,
             ],
             '/test/' => [
-                'testIndex',
                 '/test/',
                 TestController::STRING_RETURN,
             ],
-            '/test_6' => [
-                'testReturnResponseClass',
+            '/test_return_response_class' => [
                 '/test_return_response_class',
                 'Test response',
+            ],
+            '/depends' => [
+                '/depends',
+                TestController::STRING_RETURN,
             ],
         ];
     }
@@ -317,13 +324,11 @@ class RouterTest extends TestCase
         return [
             '/test/blog/{id}' => [
                 'path' => '/test/blog/123',
-                'method' => 'testParams',
                 'args' => ['123'],
                 'return' => '123',
             ],
             '/test/blog/{category}/{id}' => [
                 'path' => '/test/blog/recipes/1',
-                'method' => 'testMultipleParams',
                 'args' => ['recipes', '1'],
                 'return' => 'Category: recipes | Post ID: 1',
             ],
