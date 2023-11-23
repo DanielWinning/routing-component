@@ -21,6 +21,8 @@ class Router {
     /**
      * @param string $filename
      *
+     * @throws \RuntimeException
+     *
      * @return void
      */
     public function loadRoutesFromFile(string $filename): void

@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 class RouterTest extends TestCase
 {
     private ContainerInterface $container;
+    private string $temporaryRoutesFilepath;
 
     /**
      * @return void
@@ -23,25 +24,57 @@ class RouterTest extends TestCase
      */
     protected function setUp(): void
     {
+        $this->temporaryRoutesFilepath = sprintf('%s/%s', sys_get_temp_dir(), 'routes.yaml');
+
+        if (file_exists($this->temporaryRoutesFilepath)) {
+            unlink($this->temporaryRoutesFilepath);
+        }
+
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
     /**
+     * @param mixed $routesData
+     *
      * @return void
+     *
+     * @dataProvider getRouteFileInfo
      */
-    public function testLoadRoutesFromFile(): void
+    public function testLoadRoutesFromFile(mixed $routesData): void
     {
         $router = new Router($this->container);
+        $routesConfig = fopen($this->temporaryRoutesFilepath, 'w');
 
-        $yamlFile = 'sample_routes.yaml';
-        $yamlContent = Yaml::dump(['routes' => [['path' => '/test', 'handler' => ['TestController', 'testMethod']]]]);
-        file_put_contents($yamlFile, $yamlContent);
+        if ($routesConfig !== false) {
+            fwrite($routesConfig, is_array($routesData) ? Yaml::dump(['routes' => $routesData]) : $routesData);
+            fclose($routesConfig);
 
-        $router->loadRoutesFromFile($yamlFile);
+            if (is_array($routesData)) {
+                $router->loadRoutesFromFile($this->temporaryRoutesFilepath);
+                $this->assertSame($routesData, $router->getRoutes());
+            } else {
+                $this->expectException(\RuntimeException::class);
+                $router->loadRoutesFromFile($this->temporaryRoutesFilepath);
+            }
+        } else {
+            $this->fail('Unable to open file for writing.');
+        }
+    }
 
-        $this->assertEquals([['path' => '/test', 'handler' => ['TestController', 'testMethod']]], $router->getRoutes());
-
-        unlink($yamlFile);
+    /**
+     * @return array
+     */
+    public static function getRouteFileInfo(): array
+    {
+        return [
+            'invalid' => ['This is my routes file!'],
+            'valid' => [
+                [
+                    'path' => '/test',
+                    'handler' => ['TestController', 'testMethod'],
+                ]
+            ],
+        ];
     }
 
     /**
@@ -233,6 +266,9 @@ class RouterTest extends TestCase
         ];
     }
 
+    /**
+     * @return array[]
+     */
     public static function dynamicRouteTestCaseProvider(): array
     {
         return [
