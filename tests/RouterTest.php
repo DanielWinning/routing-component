@@ -3,8 +3,6 @@
 namespace DannyXCII\RoutingComponentTests;
 
 use DannyXCII\HttpComponent\Request;
-use DannyXCII\HttpComponent\Response;
-use DannyXCII\HttpComponent\StreamBuilder;
 use DannyXCII\HttpComponent\URI;
 use DannyXCII\RoutingComponent\Router;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
@@ -20,7 +18,6 @@ class RouterTest extends TestCase
     private ContainerInterface $container;
     private string $temporaryRoutesFilepath;
     private Router $router;
-    private MockObject $testController;
 
     /**
      * @return void
@@ -36,7 +33,7 @@ class RouterTest extends TestCase
         }
 
         $this->container = $this->createMock(ContainerInterface::class);
-        [$this->router, $this->testController] = $this->configure();
+        $this->router = $this->configure();
     }
 
     /**
@@ -80,14 +77,10 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestMatchingRoute(string $methodName, string $path, mixed $return): void
     {
-        $this->testController->expects($this->once())
-            ->method($methodName)
-            ->with([])
-            ->willReturn($return);
-
         $request = $this->buildGetRequest($this->buildUri($path));
         $response = $this->router->handleRequest($request);
         $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($return, $response->getBody()->getContents());
     }
 
     /**
@@ -121,6 +114,7 @@ class RouterTest extends TestCase
      * @param string $path
      * @param string $method
      * @param array $args
+     * @param mixed $return
      *
      * @return void
      *
@@ -130,10 +124,6 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestDynamicMatchingRoute(string $path, string $method, array $args, mixed $return): void
     {
-        $this->testController->expects($this->once())
-            ->method($method)
-            ->with(...$args)
-            ->willReturn($return);
         $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri($path)));
         $this->assertEquals(200, $response->getStatusCode());
     }
@@ -145,10 +135,6 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestWithQueryString(): void
     {
-        $this->testController->expects($this->once())
-            ->method('test_1')
-            ->with([])
-            ->willReturn(TestController::STRING_RETURN);
         $response = $this->router->handleRequest(
             $this->buildGetRequest($this->buildUri('/test', 'var=1'))
         );
@@ -162,8 +148,6 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestNoMatchingRoute(): void
     {
-        $this->testController->expects($this->never())
-            ->method($this->anything());
         $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/not-existing')));
         $this->assertEquals(404, $response->getStatusCode());
     }
@@ -175,9 +159,6 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestMatchingInvalidControllerMethod(): void
     {
-        $this->testController->expects($this->once())
-            ->method('test_7')->with([])
-            ->willReturn(null);
         $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/test_7')));
         $this->assertEquals(404, $response->getStatusCode());
     }
@@ -204,26 +185,17 @@ class RouterTest extends TestCase
     }
 
     /**
-     * @return array
+     * @return Router
      *
      * @throws MockObjectException
      */
-    private function configure(): array
+    private function configure(): Router
     {
-        $router = $this->getMockBuilder(Router::class)
-            ->setConstructorArgs([$this->container])
-            ->onlyMethods(['createControllerInstance'])
-            ->getMock();
-
+        $container = $this->createMock(ContainerInterface::class);
+        $router = new Router($container);
         $router->loadRoutes($this->getTestRoutes());
-        $testController = $this->createMock(TestController::class);
 
-        $router->expects($this->any())
-            ->method('createControllerInstance')
-            ->with(TestController::class)
-            ->willReturn($testController);
-
-        return [$router, $testController];
+        return $router;
     }
 
     /**
@@ -333,7 +305,7 @@ class RouterTest extends TestCase
             '/test_6' => [
                 'test_6',
                 '/test_6',
-                (new Response())->withStatus(200)->withBody(StreamBuilder::build('Test response')),
+                'Test response',
             ],
         ];
     }
