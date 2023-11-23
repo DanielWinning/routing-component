@@ -62,22 +62,6 @@ class RouterTest extends TestCase
     }
 
     /**
-     * @return array
-     */
-    public static function getRouteFileInfo(): array
-    {
-        return [
-            'invalid' => ['This is my routes file!'],
-            'valid' => [
-                [
-                    'path' => '/test',
-                    'handler' => ['TestController', 'testMethod'],
-                ]
-            ],
-        ];
-    }
-
-    /**
      * @param string $methodName
      * @param string $path
      *
@@ -95,9 +79,55 @@ class RouterTest extends TestCase
             ->method($methodName)
             ->with([]);
 
-        $uri = $this->buildUri($path, '');
+        $uri = $this->buildUri($path);
 
         $router->handleRequest($this->buildGetRequest($uri));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws MockObjectException
+     */
+    public function testHandleRequestWithInvalidHandlerDefinition(): void
+    {
+        [$router, $testController] = $this->configure([
+            [
+                'path' => '/',
+                'handler' => [
+                    TestController::class,
+                ],
+            ],
+        ]);
+
+        $uri = $this->buildUri('/');
+
+        $this->expectException(\RuntimeException::class);
+        $router->handleRequest($this->buildGetRequest($uri));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws MockObjectException
+     */
+    public function testItReturnsNotFoundResponseWhenControllerDoesNotExist(): void
+    {
+        [$router, $testController] = $this->configure([
+            [
+                'path' => '/',
+                'handler' => [
+                    'NotExistingController',
+                    'methodNotExists',
+                ],
+            ],
+        ]);
+
+        $uri = $this->buildUri('/');
+        $this->assertEquals(
+            404,
+            ($router->handleRequest($this->buildGetRequest($uri)))->getStatusCode()
+        );
     }
 
     /**
@@ -115,9 +145,11 @@ class RouterTest extends TestCase
     {
         [$router, $testController] = $this->configure();
 
-        $testController->expects($this->once())->method($method)->with(...$args);
+        $testController->expects($this->once())
+            ->method($method)
+            ->with(...$args);
 
-        $uri = $this->buildUri($path, '');
+        $uri = $this->buildUri($path);
 
         $router->handleRequest($this->buildGetRequest($uri));
     }
@@ -152,7 +184,7 @@ class RouterTest extends TestCase
         $testController->expects($this->never())
             ->method($this->anything());
 
-        $uri = $this->buildUri('/not-existing', '');
+        $uri = $this->buildUri('/not-existing');
         $response = $router->handleRequest($this->buildGetRequest($uri));
 
         $this->assertEquals(404, $response->getStatusCode());
@@ -164,7 +196,7 @@ class RouterTest extends TestCase
      *
      * @return UriInterface
      */
-    private function buildUri(string $path, string $query): UriInterface
+    private function buildUri(string $path, string $query = ''): UriInterface
     {
         return new URI('https', 'localhost', $path, $query);
     }
@@ -180,18 +212,20 @@ class RouterTest extends TestCase
     }
 
     /**
+     * @param array $routes
+     *
      * @return array
      *
      * @throws MockObjectException
      */
-    private function configure(): array
+    private function configure(array $routes = []): array
     {
         $router = $this->getMockBuilder(Router::class)
             ->setConstructorArgs([$this->container])
             ->onlyMethods(['createControllerInstance'])
             ->getMock();
 
-        $router->loadRoutes($this->getTestRoutes());
+        $router->loadRoutes(!empty($routes) ? $routes : $this->getTestRoutes());
         $testController = $this->createMock(TestController::class);
 
         $router->expects($this->any())
@@ -281,6 +315,22 @@ class RouterTest extends TestCase
                 'path' => '/test/blog/recipes/1',
                 'method' => 'test_5',
                 'args' => ['recipes', '1'],
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRouteFileInfo(): array
+    {
+        return [
+            'invalid' => ['This is my routes file!'],
+            'valid' => [
+                [
+                    'path' => '/test',
+                    'handler' => ['TestController', 'testMethod'],
+                ]
             ],
         ];
     }
