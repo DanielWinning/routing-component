@@ -2,7 +2,7 @@
 
 <div>
 <!-- Version Badge -->
-<img src="https://img.shields.io/badge/Version-1.3.2-blue" alt="Version 1.3.2">
+<img src="https://img.shields.io/badge/Version-1.3.3-blue" alt="Version 1.3.3">
 <!-- PHP Coverage Badge -->
 <img src="https://img.shields.io/badge/PHP Coverage-100.00%25-green" alt="PHP Coverage 100.00%">
 <!-- License Badge -->
@@ -18,7 +18,7 @@ injection containers.
 You can install this package using Composer:
 
 ```bash
-composer require dannyxcii/routing-component
+composer require lumax/routing-component
 ```
 
 ## Usage
