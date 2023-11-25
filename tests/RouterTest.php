@@ -1,10 +1,10 @@
 <?php
 
-namespace DannyXCII\RoutingComponentTests;
+namespace Luma\RoutingComponentTests;
 
-use DannyXCII\HttpComponent\Request;
-use DannyXCII\HttpComponent\URI;
-use DannyXCII\RoutingComponent\Router;
+use Luma\HttpComponent\Request;
+use Luma\HttpComponent\URI;
+use Luma\RoutingComponent\Router;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;

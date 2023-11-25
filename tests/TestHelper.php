@@ -1,6 +1,6 @@
 <?php
 
-namespace DannyXCII\RoutingComponentTests;
+namespace Luma\RoutingComponentTests;
 
 class TestHelper
 {

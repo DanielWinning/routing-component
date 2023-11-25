@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "483402090fb32b6076ea1a9151932a68",
+    "content-hash": "fe71aa296d2747472ac28ab243ba95e4",
     "packages": [
         {
-            "name": "dannyxcii/http-component",
-            "version": "2.0.0",
+            "name": "lumax/http-component",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DanielWinning/http-component.git",
-                "reference": "82bca841413fea38676dc9ef63c402b9e1795fdb"
+                "reference": "cecb6cdc8284adb919520b209e0f5f54e9ff1a06"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DanielWinning/http-component/zipball/82bca841413fea38676dc9ef63c402b9e1795fdb",
-                "reference": "82bca841413fea38676dc9ef63c402b9e1795fdb",
+                "url": "https://api.github.com/repos/DanielWinning/http-component/zipball/cecb6cdc8284adb919520b209e0f5f54e9ff1a06",
+                "reference": "cecb6cdc8284adb919520b209e0f5f54e9ff1a06",
                 "shasum": ""
             },
             "require": {
@@ -31,8 +31,8 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "DannyXCII\\HttpComponent\\": "src/",
-                    "DannyXCII\\HttpComponentTests\\": "tests/"
+                    "Luma\\HttpComponent\\": "src/",
+                    "Luma\\HttpComponentTests\\": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -48,9 +48,9 @@
             "description": "A component for handling HTTP Requests/Responses",
             "support": {
                 "issues": "https://github.com/DanielWinning/http-component/issues",
-                "source": "https://github.com/DanielWinning/http-component/tree/2.0.0"
+                "source": "https://github.com/DanielWinning/http-component/tree/2.0.4"
             },
-            "time": "2023-09-07T21:54:45+00:00"
+            "time": "2023-11-25T23:31:37+00:00"
         },
         {
             "name": "psr/container",
@@ -107,16 +107,16 @@
         },
         {
             "name": "psr/http-client",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-client.git",
-                "reference": "0955afe48220520692d2d09f7ab7e0f93ffd6a31"
+                "reference": "bb5906edc1c324c9a05aa0873d40117941e5fa90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-client/zipball/0955afe48220520692d2d09f7ab7e0f93ffd6a31",
-                "reference": "0955afe48220520692d2d09f7ab7e0f93ffd6a31",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/bb5906edc1c324c9a05aa0873d40117941e5fa90",
+                "reference": "bb5906edc1c324c9a05aa0873d40117941e5fa90",
                 "shasum": ""
             },
             "require": {
@@ -153,9 +153,9 @@
                 "psr-18"
             ],
             "support": {
-                "source": "https://github.com/php-fig/http-client/tree/1.0.2"
+                "source": "https://github.com/php-fig/http-client"
             },
-            "time": "2023-04-10T20:12:12+00:00"
+            "time": "2023-09-23T14:17:50+00:00"
         },
         {
             "name": "psr/http-message",

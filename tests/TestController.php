@@ -1,9 +1,9 @@
 <?php
 
-namespace DannyXCII\RoutingComponentTests;
+namespace Luma\RoutingComponentTests;
 
-use DannyXCII\HttpComponent\Response;
-use DannyXCII\HttpComponent\StreamBuilder;
+use Luma\HttpComponent\Response;
+use Luma\HttpComponent\StreamBuilder;
 
 class TestController
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace DannyXCII\RoutingComponent;
+namespace Luma\RoutingComponent;
 
-use DannyXCII\HttpComponent\Response;
-use DannyXCII\HttpComponent\Stream;
+use Luma\HttpComponent\Response;
+use Luma\HttpComponent\Stream;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
