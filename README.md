@@ -1,4 +1,4 @@
-# Routing Component Package
+# Luma | Routing Component
 
 <div>
 <!-- Version Badge -->
