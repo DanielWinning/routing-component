@@ -164,7 +164,7 @@ class RouterTest extends TestCase
      *
      * @throws \ReflectionException|\Throwable
      */
-    public function testControllerHasInvalidParamType(): void
+    public function testControllerHasStringParamType(): void
     {
         $this->router->loadRoutes([
             [
@@ -175,7 +175,7 @@ class RouterTest extends TestCase
                 ]
             ]
         ]);
-        $this->expectException(\RuntimeException::class);
+        $this->expectNotToPerformAssertions();
         $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
     }
 

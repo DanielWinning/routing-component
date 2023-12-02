@@ -157,15 +157,22 @@ class Router {
         foreach ($constructor->getParameters() as $parameter) {
             $paramType = $parameter->getType();
 
-            if ($paramType && !$paramType->isBuiltin()) {
+            if ($paramType) {
                 $dependencyName = $paramType->getName();
-                $dependency = $container->get($dependencyName);
 
-                if (!$dependency) {
-                    throw new \RuntimeException(sprintf('Dependency not found: %s', $dependencyName));
+                try {
+                    $dependency = $paramType->isBuiltin() ? $dependencyName : $container->get($dependencyName);
+
+                    if (!$dependency) throw new \Exception();
+
+                    $dependencies[] = $dependency;
+                } catch (\Exception $exception) {
+                    throw new \RuntimeException(
+                        sprintf('Dependency not found: %s', $dependencyName),
+                        0,
+                        $exception
+                    );
                 }
-
-                $dependencies[] = $dependency;
             } else {
                 throw new \RuntimeException(sprintf('Unsupported parameter type: %s', $parameter->getName()));
             }
