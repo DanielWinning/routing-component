@@ -2,7 +2,7 @@
 
 <div>
 <!-- Version Badge -->
-<img src="https://img.shields.io/badge/Version-1.3.4-blue" alt="Version 1.3.4">
+<img src="https://img.shields.io/badge/Version-1.3.5-blue" alt="Version 1.3.5">
 <!-- PHP Coverage Badge -->
 <img src="https://img.shields.io/badge/PHP Coverage-97.85%25-green" alt="PHP Coverage 97.85%">
 <!-- License Badge -->
@@ -31,7 +31,7 @@ Create an instance of the `Router` class, passing a dependency injection contain
 `Psr\Container\ContainerInterface`:
 
 ```php
-use DannyXCII\RoutingComponent\Router;
+use Luma\RoutingComponent\Router;
 use Psr\Container\ContainerInterface;
 
 $router = new Router($container);
