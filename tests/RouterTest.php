@@ -200,6 +200,26 @@ class RouterTest extends TestCase
     }
 
     /**
+     * @return void
+     *
+     * @throws \ReflectionException|\Throwable
+     */
+    public function testControllerWithNonTypeHintedDependencies()
+    {
+        $this->router->loadRoutes([
+            [
+                'path' => '/',
+                'handler' => [
+                    TestControllerWithAmbiguousDependencies::class,
+                    'index'
+                ]
+            ]
+        ]);
+        $this->expectException(\RuntimeException::class);
+        $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+    }
+
+    /**
      * @param string $path
      * @param string $query
      *
