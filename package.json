@@ -1,6 +1,5 @@
 {
   "name": "routing-component",
-  "version": "1.2.0",
   "description": "A dynamic PHP Routing Component",
   "repository": {
     "type": "git",

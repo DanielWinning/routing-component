@@ -1,6 +1,6 @@
 <?php
 
-namespace Luma\RoutingComponentTests;
+namespace Luma\Tests;
 
 class TestControllerWithAmbiguousDependencies
 {

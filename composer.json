@@ -1,35 +1,36 @@
 {
-    "name": "lumax/routing-component",
-    "description": "A dynamic PHP Routing Component.",
-    "type": "library",
-    "autoload": {
-        "psr-4": {
-            "Luma\\RoutingComponent\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Luma\\RoutingComponentTests\\": "tests/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Daniel Winning",
-            "email": "daniel@winningsoftware.co.uk"
-        }
-    ],
-    "require": {
-        "psr/container": "^2.0",
-        "symfony/yaml": "^6.3",
-        "psr/http-message": "^2.0",
-        "lumax/http-component": "^2.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^10.3"
-    },
-    "scripts": {
-        "test": "php -d xdebug.mode=coverage ./vendor/bin/phpunit --testdox --colors=always --coverage-html coverage --coverage-clover coverage/coverage.xml --testdox-html coverage/testdox.html && npx badger --phpunit ./coverage/coverage.xml && npx badger --version ./composer.json && npx badger --license ./composer.json"
-    },
-    "version": "1.3.7",
-    "license": "GPL-3.0-or-later"
+  "name": "lumax/routing-component",
+  "description": "A dynamic PHP Routing Component.",
+  "type": "library",
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Luma\\RoutingComponent\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Luma\\Tests\\": "tests/Unit/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Daniel Winning",
+      "email": "daniel@winningsoftware.co.uk"
+    }
+  ],
+  "require": {
+    "psr/container": "^2.0",
+    "symfony/yaml": "^6.3",
+    "psr/http-message": "^2.0",
+    "lumax/http-component": "^2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.3"
+  },
+  "scripts": {
+    "test": "php -d xdebug.mode=coverage ./vendor/bin/phpunit --testdox --colors=always --coverage-html coverage --coverage-clover coverage/coverage.xml --testdox-html coverage/testdox.html && npx badger --phpunit ./coverage/coverage.xml && npx badger --version ./composer.json && npx badger --license ./composer.json"
+  },
+  "version": "1.3.8",
+  "license": "GPL-3.0-or-later"
 }

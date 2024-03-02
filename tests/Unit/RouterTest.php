@@ -1,9 +1,9 @@
 <?php
 
-namespace Luma\RoutingComponentTests;
+namespace Luma\Tests;
 
 use Luma\HttpComponent\Request;
-use Luma\HttpComponent\URI;
+use Luma\HttpComponent\Uri;
 use Luma\RoutingComponent\Router;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use PHPUnit\Framework\TestCase;
