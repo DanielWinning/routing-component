@@ -1,6 +1,6 @@
 <?php
 
-namespace Luma\RoutingComponentTests;
+namespace Luma\Tests;
 
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\StreamBuilder;

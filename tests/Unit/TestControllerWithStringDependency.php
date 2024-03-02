@@ -1,10 +1,10 @@
 <?php
 
-namespace Luma\RoutingComponentTests;
+namespace Luma\Tests;
 
-class TestControllerWithUndefinedDependency
+class TestControllerWithStringDependency
 {
-    public function __construct(UndefinedTestHelper $undefinedTestHelper)
+    public function __construct(string $invalidParamType)
     {
         //
     }

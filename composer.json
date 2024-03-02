@@ -10,7 +10,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Luma\\RoutingComponentTests\\": "tests/"
+            "Luma\\Tests\\": "tests/Unit/"
         }
     },
     "authors": [
