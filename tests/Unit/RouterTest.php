@@ -3,9 +3,8 @@
 namespace Luma\Tests;
 
 use Luma\HttpComponent\Request;
-use Luma\HttpComponent\URI;
+use Luma\HttpComponent\Uri;
 use Luma\RoutingComponent\Router;
-use Luma\Tests\TestHelper;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
