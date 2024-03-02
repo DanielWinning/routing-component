@@ -2,6 +2,7 @@
     "name": "lumax/routing-component",
     "description": "A dynamic PHP Routing Component.",
     "type": "library",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "Luma\\RoutingComponent\\": "src/"
