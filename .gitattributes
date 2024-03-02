@@ -2,3 +2,5 @@
 phpunit.xml export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
+dev.jenkinsfile export-ignore
+main.jenkinsfile export-ignore

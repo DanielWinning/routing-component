@@ -9,7 +9,7 @@ class TestController
 {
     public const STRING_RETURN = 'string';
 
-    public function testIndex(array $matches = []): ?string
+    public function testIndex(): ?string
     {
         return self::STRING_RETURN;
     }
