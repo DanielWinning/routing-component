@@ -10,7 +10,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Luma\\Tests\\": "tests/Unit/"
+      "Luma\\Tests\\": "tests/"
     }
   },
   "authors": [

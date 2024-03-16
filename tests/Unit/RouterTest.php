@@ -1,10 +1,17 @@
 <?php
 
-namespace Luma\Tests;
+namespace Luma\Tests\Unit;
 
 use Luma\HttpComponent\Request;
 use Luma\HttpComponent\Uri;
 use Luma\RoutingComponent\Router;
+use Luma\Tests\Classes\TestHelper;
+use Luma\Tests\Classes\UndefinedTestHelper;
+use Luma\Tests\Controllers\TestController;
+use Luma\Tests\Controllers\TestControllerWithAmbiguousDependencies;
+use Luma\Tests\Controllers\TestControllerWithDependencies;
+use Luma\Tests\Controllers\TestControllerWithStringDependency;
+use Luma\Tests\Controllers\TestControllerWithUndefinedDependency;
 use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
