@@ -39,21 +39,17 @@ class TestController
     }
 
     /**
-     * @param array $matches
-     *
      * @return Response
      */
-    public function testReturnResponseClass(array $matches = []): Response
+    public function testReturnResponseClass(): Response
     {
         return (new Response())->withStatus(200)->withBody(StreamBuilder::build('Test response'));
     }
 
     /**
-     * @param array $matches
-     *
      * @return string|null
      */
-    public function testReturnInvalidResponse(array $matches = []): ?string
+    public function testReturnInvalidResponse(): string|null
     {
         return null;
     }
