@@ -1,8 +1,7 @@
 <?php
 
-namespace Luma\Tests;
+namespace Luma\Tests\Classes;
 
 class UndefinedTestHelper
 {
-
 }

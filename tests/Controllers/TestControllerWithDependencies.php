@@ -1,6 +1,8 @@
 <?php
 
-namespace Luma\Tests;
+namespace Luma\Tests\Controllers;
+
+use Luma\Tests\Classes\TestHelper;
 
 class TestControllerWithDependencies
 {
