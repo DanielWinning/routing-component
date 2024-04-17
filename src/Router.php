@@ -2,6 +2,7 @@
 
 namespace Luma\RoutingComponent;
 
+use Luma\HttpComponent\Request;
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\Stream;
 use Psr\Container\ContainerInterface;
@@ -57,7 +58,7 @@ class Router {
                     return !is_numeric($key);
                 }, ARRAY_FILTER_USE_BOTH);
 
-                return $this->callHandler($route['handler'], $matches);
+                return $this->callHandler($route['handler'], $matches, $request);
             }
         }
 
@@ -81,12 +82,13 @@ class Router {
     /**
      * @param array $handler
      * @param array $matches
+     * @param RequestInterface $request
      *
      * @return ResponseInterface
      *
      * @throws \ReflectionException|\Exception|\Throwable
      */
-    private function callHandler(array $handler, array $matches): ResponseInterface
+    private function callHandler(array $handler, array $matches, RequestInterface $request): ResponseInterface
     {
         if (count($handler) !== 2) {
             throw new \RuntimeException('Invalid handler format');
@@ -106,7 +108,7 @@ class Router {
             }
 
             if (method_exists($controller, $methodName)) {
-                return $this->invokeControllerMethod($controller, $methodName, $matches);
+                return $this->invokeControllerMethod($controller, $methodName, $matches, $request);
             }
         }
 
@@ -185,11 +187,23 @@ class Router {
      * @param $controller
      * @param string $methodName
      * @param array $matches
+     * @param RequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws \ReflectionException
      */
-    private function invokeControllerMethod($controller, string $methodName, array $matches): ResponseInterface
+    private function invokeControllerMethod($controller, string $methodName, array $matches, RequestInterface $request): ResponseInterface
     {
+        $reflectionMethod = new \ReflectionMethod($controller, $methodName);
+        $hasRequestParameter = (bool) count(array_filter(array_map(function (\ReflectionParameter $parameter) {
+            return $parameter->getType()->getName() === Request::class;
+        }, $reflectionMethod->getParameters())));
+
+        if ($hasRequestParameter) {
+            array_unshift($matches, $request);
+        }
+
         $result = call_user_func_array([$controller, $methodName], $matches);
 
         if ($result instanceof ResponseInterface) {

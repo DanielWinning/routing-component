@@ -2,6 +2,7 @@
 
 namespace Luma\Tests\Controllers;
 
+use Luma\HttpComponent\Request;
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\StreamBuilder;
 
@@ -41,7 +42,7 @@ class TestController
     /**
      * @return Response
      */
-    public function testReturnResponseClass(): Response
+    public function testReturnResponseClass(Request $request): Response
     {
         return (new Response())->withStatus(200)->withBody(StreamBuilder::build('Test response'));
     }
