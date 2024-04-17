@@ -3,6 +3,7 @@
 namespace Luma\Tests\Unit;
 
 use Luma\HttpComponent\Request;
+use Luma\HttpComponent\Response;
 use Luma\HttpComponent\Uri;
 use Luma\RoutingComponent\Router;
 use Luma\Tests\Classes\TestHelper;
@@ -218,12 +219,37 @@ class RouterTest extends TestCase
                 'path' => '/',
                 'handler' => [
                     TestControllerWithAmbiguousDependencies::class,
-                    'index'
-                ]
-            ]
+                    'index',
+                ],
+            ],
         ]);
         $this->expectException(\RuntimeException::class);
         $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws \ReflectionException|\Throwable
+     */
+    public function testShouldReturnNotFoundResponseWithIncorrectRequestMethod(): void
+    {
+        $this->router->loadRoutes([
+            [
+                'path' => '/',
+                'handler' => [
+                    TestController::class,
+                    'testIndex',
+                ],
+                'methods' => [
+                    'POST'
+                ],
+            ],
+        ]);
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals('404 Not Found', $response->getBody()->getContents());
     }
 
     /**
@@ -348,6 +374,14 @@ class RouterTest extends TestCase
                 'handler' => [
                     TestControllerWithDependencies::class,
                     'testMethodWithDependantController',
+                ],
+            ],
+            [
+                'path' => '/test-methods',
+                'methods' => ['GET'],
+                'handler' => [
+                    TestController::class,
+                    'testIndex',
                 ],
             ],
         ];

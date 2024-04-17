@@ -49,6 +49,10 @@ class Router {
         $requestPath = $requestPath === '/' ? $requestPath : rtrim($requestPath, '/');
 
         foreach ($this->routes as $route) {
+            if (array_key_exists('methods', $route) && !in_array($request->getMethod(), $route['methods'])) {
+                continue;
+            }
+
             $pattern = $this->generateRoutePattern($route['path']);
 
             if (preg_match($pattern, $requestPath, $matches)) {
