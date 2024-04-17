@@ -2,7 +2,6 @@
 
 namespace Luma\RoutingComponent;
 
-use Luma\HttpComponent\Request;
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\Stream;
 use Psr\Container\ContainerInterface;
@@ -195,12 +194,7 @@ class Router {
      */
     private function invokeControllerMethod($controller, string $methodName, array $matches, RequestInterface $request): ResponseInterface
     {
-        $reflectionMethod = new \ReflectionMethod($controller, $methodName);
-        $hasRequestParameter = (bool) count(array_filter(array_map(function (\ReflectionParameter $parameter) {
-            return $parameter->getType()->getName() === Request::class;
-        }, $reflectionMethod->getParameters())));
-
-        if ($hasRequestParameter) {
+        if ($this->methodHasRequestParameter($controller, $methodName)) {
             array_unshift($matches, $request);
         }
 
@@ -229,6 +223,39 @@ class Router {
         }
 
         return $this->notFoundResponse();
+    }
+
+    /**
+     * @param $controller
+     * @param string $methodName
+     *
+     * @return bool
+     *
+     * @throws \ReflectionException
+     */
+    private function methodHasRequestParameter($controller, string $methodName): bool
+    {
+        $reflectionMethod = new \ReflectionMethod($controller, $methodName);
+
+        return (bool) count(array_filter(array_map(function (\ReflectionParameter $parameter) {
+            $parameterType = $parameter->getType();
+
+            if (!$parameterType instanceof \ReflectionNamedType) {
+                return false;
+            }
+
+            if (!class_exists($parameterType->getName())) {
+                return false;
+            }
+
+            $interfaces = class_implements($parameterType->getName());
+
+            if (!is_array($interfaces)) {
+                return false;
+            }
+
+            return array_key_exists(RequestInterface::class, $interfaces);
+        }, $reflectionMethod->getParameters())));
     }
 
     /**
