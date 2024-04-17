@@ -57,7 +57,7 @@ class Router {
                     return !is_numeric($key);
                 }, ARRAY_FILTER_USE_BOTH);
 
-                return $this->callHandler($route['handler'], $matches);
+                return $this->callHandler($route['handler'], $matches, $request);
             }
         }
 
@@ -81,12 +81,13 @@ class Router {
     /**
      * @param array $handler
      * @param array $matches
+     * @param RequestInterface $request
      *
      * @return ResponseInterface
      *
      * @throws \ReflectionException|\Exception|\Throwable
      */
-    private function callHandler(array $handler, array $matches): ResponseInterface
+    private function callHandler(array $handler, array $matches, RequestInterface $request): ResponseInterface
     {
         if (count($handler) !== 2) {
             throw new \RuntimeException('Invalid handler format');
@@ -106,7 +107,7 @@ class Router {
             }
 
             if (method_exists($controller, $methodName)) {
-                return $this->invokeControllerMethod($controller, $methodName, $matches);
+                return $this->invokeControllerMethod($controller, $methodName, $matches, $request);
             }
         }
 
@@ -185,11 +186,18 @@ class Router {
      * @param $controller
      * @param string $methodName
      * @param array $matches
+     * @param RequestInterface $request
      *
      * @return ResponseInterface
+     *
+     * @throws \ReflectionException
      */
-    private function invokeControllerMethod($controller, string $methodName, array $matches): ResponseInterface
+    private function invokeControllerMethod($controller, string $methodName, array $matches, RequestInterface $request): ResponseInterface
     {
+        if ($this->methodHasRequestParameter($controller, $methodName)) {
+            array_unshift($matches, $request);
+        }
+
         $result = call_user_func_array([$controller, $methodName], $matches);
 
         if ($result instanceof ResponseInterface) {
@@ -215,6 +223,39 @@ class Router {
         }
 
         return $this->notFoundResponse();
+    }
+
+    /**
+     * @param $controller
+     * @param string $methodName
+     *
+     * @return bool
+     *
+     * @throws \ReflectionException
+     */
+    private function methodHasRequestParameter($controller, string $methodName): bool
+    {
+        $reflectionMethod = new \ReflectionMethod($controller, $methodName);
+
+        return (bool) count(array_filter(array_map(function (\ReflectionParameter $parameter) {
+            $parameterType = $parameter->getType();
+
+            if (!$parameterType instanceof \ReflectionNamedType) {
+                return false;
+            }
+
+            if (!class_exists($parameterType->getName())) {
+                return false;
+            }
+
+            $interfaces = class_implements($parameterType->getName());
+
+            if (!is_array($interfaces)) {
+                return false;
+            }
+
+            return array_key_exists(RequestInterface::class, $interfaces);
+        }, $reflectionMethod->getParameters())));
     }
 
     /**
