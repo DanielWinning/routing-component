@@ -1,5 +1,26 @@
 # Luma | Routing Component Changelog
 
+## [1.4.2] - 2024-04-17
+### Added
+- N/A
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- N/A
+
+### Security
+- Update `lumax/http-component` dependency from `2.0.6` -> `2.1.0`
+
+---
+
 ## [1.4.1] - 2024-04-17
 ### Added
 - N/A
@@ -18,6 +39,8 @@
 
 ### Security
 - N/A
+
+---
 
 ## [1.4.0] - 2024-04-17
 ### Added
