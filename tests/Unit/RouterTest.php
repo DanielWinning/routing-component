@@ -2,6 +2,8 @@
 
 namespace Luma\Tests\Unit;
 
+use Luma\DependencyInjectionComponent\Exception\NotFoundException;
+use Luma\Framework\Luma;
 use Luma\HttpComponent\Request;
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\Uri;
@@ -33,6 +35,24 @@ class RouterTest extends TestCase
      */
     protected function setUp(): void
     {
+        $tmpRoutePath = sprintf('%s/%s', sys_get_temp_dir(), 'routes.yaml');
+        $tmpConfigPath = sprintf('%s/%s', sys_get_temp_dir(), 'services.yaml');
+        $dummyRoutes = [
+            'index' => [
+                'path' => '/test',
+                'handler' => ['TestController', 'testMethod'],
+            ]
+        ];
+
+        file_put_contents($tmpRoutePath, Yaml::dump(['routes' => $dummyRoutes]));
+        file_put_contents($tmpConfigPath, '');
+
+        try {
+            $luma = new Luma(sys_get_temp_dir(), sys_get_temp_dir(), sys_get_temp_dir());
+        } catch (\Exception|\Throwable $exception) {
+            die($exception->getMessage());
+        }
+
         $this->temporaryRoutesFilepath = sprintf('%s/%s', sys_get_temp_dir(), 'routes.yaml');
 
         if (file_exists($this->temporaryRoutesFilepath)) {
