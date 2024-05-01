@@ -234,6 +234,14 @@ class Router {
             }
         }
 
+        $requireUnauthenticatedAttribute = $reflectionMethod->getAttributes(RequireAuthentication::class);
+
+        if (!empty($requireUnauthenticatedAttribute)) {
+            if ($authenticatedUser) {
+                return $this->notAllowedResponse();
+            }
+        }
+
         $requireRolesAttribute = $reflectionMethod->getAttributes(RequireRoles::class);
 
         if (!empty($requireRolesAttribute)) {

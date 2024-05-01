@@ -1,5 +1,26 @@
 # Luma | Routing Component Changelog
 
+## [1.5.1] - 2024-05-02
+### Added
+- Added additional attribute `RequireUnauthenticated`
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- N/A
+
+### Security
+- N/A
+
+---
+
 ## [1.5.0] - 2024-05-02
 ### Added
 - Added route protection attributes: `RequireAuthentication`, `RequireRoles` and `RequirePermissions`
