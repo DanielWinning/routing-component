@@ -2,8 +2,13 @@
 
 namespace Luma\RoutingComponent;
 
+use Luma\Framework\Luma;
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\Stream;
+use Luma\RoutingComponent\Attribute\RequireAuthentication;
+use Luma\RoutingComponent\Attribute\RequirePermissions;
+use Luma\RoutingComponent\Attribute\RequireRoles;
+use Luma\SecurityComponent\Authorization\Interface\RoleInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -123,13 +128,33 @@ class Router {
      */
     private function notFoundResponse(): ResponseInterface
     {
+        return $this->badResponse('404 Not Found', 404, 'Not Found');
+    }
+
+    /**
+     * @return Response
+     */
+    private function notAllowedResponse(): Response
+    {
+        return $this->badResponse('403 Not Allowed', 403, 'Not Allowed');
+    }
+
+    /**
+     * @param string $displayText
+     * @param int $code
+     * @param string $reasonText
+     *
+     * @return Response
+     */
+    private function badResponse(string $displayText, int $code, string $reasonText): Response
+    {
         $stream = new Stream(fopen('php://temp', 'r+'));
-        $stream->write('404 Not Found');
+        $stream->write($displayText);
         $stream->rewind();
 
         return new Response(
-            404,
-            'Not Found',
+            $code,
+            $reasonText,
             [
                 'Content-Type' => 'text/html',
             ],
@@ -198,6 +223,51 @@ class Router {
      */
     private function invokeControllerMethod($controller, string $methodName, array $matches, RequestInterface $request): ResponseInterface
     {
+        $reflectionMethod = new \ReflectionMethod($controller, $methodName);
+
+        $requireAuthenticationAttribute = $reflectionMethod->getAttributes(RequireAuthentication::class);
+        $authenticatedUser = Luma::getLoggedInUser();
+
+        if (!empty($requireAuthenticationAttribute)) {
+            if (!$authenticatedUser) {
+                return $this->notAllowedResponse();
+            }
+        }
+
+        $requireRolesAttribute = $reflectionMethod->getAttributes(RequireRoles::class);
+
+        if (!empty($requireRolesAttribute)) {
+            if (!$authenticatedUser) {
+                return $this->notAllowedResponse();
+            }
+
+            $roles = $requireRolesAttribute[0]->getArguments()[0];
+
+            foreach ($roles as $role) {
+                if (!$authenticatedUser->hasRole($role)) {
+                    return $this->notAllowedResponse();
+                }
+            }
+        }
+
+        $requirePermissionsAttribute = $reflectionMethod->getAttributes(RequirePermissions::class);
+
+        if (!empty($requirePermissionsAttribute)) {
+            if (!$authenticatedUser) {
+                return $this->notAllowedResponse();
+            }
+
+            $permissions = $requirePermissionsAttribute[0]->getArguments()[0];
+
+            foreach ($authenticatedUser->getRoles() as $role) {
+                foreach ($permissions as $permission) {
+                    if (!$role->hasPermission($permission)) {
+                        return $this->notAllowedResponse();
+                    }
+                }
+            }
+        }
+
         if ($this->methodHasRequestParameter($controller, $methodName)) {
             array_unshift($matches, $request);
         }
