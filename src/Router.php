@@ -8,6 +8,7 @@ use Luma\HttpComponent\Stream;
 use Luma\RoutingComponent\Attribute\RequireAuthentication;
 use Luma\RoutingComponent\Attribute\RequirePermissions;
 use Luma\RoutingComponent\Attribute\RequireRoles;
+use Luma\RoutingComponent\Attribute\RequireUnauthenticated;
 use Luma\SecurityComponent\Authorization\Interface\RoleInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
@@ -234,7 +235,7 @@ class Router {
             }
         }
 
-        $requireUnauthenticatedAttribute = $reflectionMethod->getAttributes(RequireAuthentication::class);
+        $requireUnauthenticatedAttribute = $reflectionMethod->getAttributes(RequireUnauthenticated::class);
 
         if (!empty($requireUnauthenticatedAttribute)) {
             if ($authenticatedUser) {

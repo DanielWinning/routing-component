@@ -5,6 +5,8 @@ namespace Luma\Tests\Controllers;
 use Luma\HttpComponent\Request;
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\StreamBuilder;
+use Luma\RoutingComponent\Attribute\RequireAuthentication;
+use Luma\RoutingComponent\Attribute\RequireUnauthenticated;
 
 class TestController
 {
@@ -40,6 +42,8 @@ class TestController
     }
 
     /**
+     * @param Request $request
+     *
      * @return Response
      */
     public function testReturnResponseClass(Request $request): Response
@@ -53,5 +57,23 @@ class TestController
     public function testReturnInvalidResponse(): string|null
     {
         return null;
+    }
+
+    /**
+     * @return void
+     */
+    #[RequireAuthentication]
+    public function notAuthenticated(): void
+    {
+        //
+    }
+
+    /**
+     * @return string
+     */
+    #[RequireUnauthenticated]
+    public function notAuthenticatedSuccess(): string
+    {
+        return 'Success';
     }
 }

@@ -35,6 +35,7 @@ class RouterTest extends TestCase
      */
     protected function setUp(): void
     {
+        $_SESSION = [];
         $tmpRoutePath = sprintf('%s/%s', sys_get_temp_dir(), 'routes.yaml');
         $tmpConfigPath = sprintf('%s/%s', sys_get_temp_dir(), 'services.yaml');
         $dummyRoutes = [
@@ -94,6 +95,7 @@ class RouterTest extends TestCase
     /**
      * @param string $path
      * @param mixed $return
+     * @param int $statusCode
      *
      * @return void
      *
@@ -101,11 +103,11 @@ class RouterTest extends TestCase
      *
      * @dataProvider routeTestCaseProvider
      */
-    public function testHandleRequestMatchingRoute(string $path, mixed $return): void
+    public function testHandleRequestMatchingRoute(string $path, mixed $return, int $statusCode = 200): void
     {
         $request = $this->buildGetRequest($this->buildUri($path));
         $response = $this->router->handleRequest($request);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($statusCode, $response->getStatusCode());
         $this->assertEquals($return, $response->getBody()->getContents());
     }
 
@@ -245,6 +247,52 @@ class RouterTest extends TestCase
         ]);
         $this->expectException(\RuntimeException::class);
         $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+    }
+
+    /**
+     * @return void
+     *
+     * @throws \ReflectionException|\Throwable
+     */
+    public function testUnauthenticatedResponseReturned()
+    {
+        $this->router->loadRoutes([
+            [
+                'path' => '/',
+                'handler' => [
+                    TestController::class,
+                    'notAuthenticated',
+                ],
+            ],
+        ]);
+
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+
+        $this->assertEquals('403 Not Allowed', $response->getBody()->getContents());
+        $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    /**
+     * @return void
+     *
+     * @throws \ReflectionException|\Throwable
+     */
+    public function testRequireUnauthenticatedRoute()
+    {
+        $this->router->loadRoutes([
+            [
+                'path' => '/',
+                'handler' => [
+                    TestController::class,
+                    'notAuthenticatedSuccess',
+                ],
+            ],
+        ]);
+
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+
+        $this->assertEquals('Success', $response->getBody()->getContents());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     /**
@@ -404,6 +452,14 @@ class RouterTest extends TestCase
                     'testIndex',
                 ],
             ],
+            [
+                'path' => '/not-authenticated',
+                'methods' => ['GET'],
+                'handler' => [
+                    TestController::class,
+                    'notAuthenticated',
+                ],
+            ],
         ];
     }
 
@@ -436,6 +492,11 @@ class RouterTest extends TestCase
             '/depends' => [
                 '/depends',
                 TestController::STRING_RETURN,
+            ],
+            '/not-authenticated' => [
+                '/not-authenticated',
+                '403 Not Allowed',
+                403
             ],
         ];
     }
