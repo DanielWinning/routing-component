@@ -1,5 +1,26 @@
 # Luma | Routing Component Changelog
 
+## [1.6.0] - 2024-05-05
+### Added
+- Added `redirectPath` and `message` to route protection attributes
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- N/A
+
+### Security
+- N/A
+
+---
+
 ## [1.5.2] - 2024-05-02
 ### Added
 - N/A

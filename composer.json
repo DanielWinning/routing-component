@@ -33,6 +33,6 @@
   "scripts": {
     "test": "php -d xdebug.mode=coverage ./vendor/bin/phpunit --testdox --colors=always --coverage-html coverage --coverage-clover coverage/coverage.xml --testdox-html coverage/testdox.html && npx badger --phpunit ./coverage/coverage.xml && npx badger --version ./composer.json && npx badger --license ./composer.json"
   },
-  "version": "1.5.2",
+  "version": "1.6.0",
   "license": "GPL-3.0-or-later"
 }
