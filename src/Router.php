@@ -9,7 +9,7 @@ use Luma\RoutingComponent\Attribute\RequireAuthentication;
 use Luma\RoutingComponent\Attribute\RequirePermissions;
 use Luma\RoutingComponent\Attribute\RequireRoles;
 use Luma\RoutingComponent\Attribute\RequireUnauthenticated;
-use Luma\SecurityComponent\Authorization\Interface\RoleInterface;
+use Luma\SecurityComponent\Authentication\Interface\UserInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -224,57 +224,10 @@ class Router {
      */
     private function invokeControllerMethod($controller, string $methodName, array $matches, RequestInterface $request): ResponseInterface
     {
-        $reflectionMethod = new \ReflectionMethod($controller, $methodName);
+        $notAllowedResponse = $this->handleRouteProtectionAttributes($controller, $methodName);
 
-        $requireAuthenticationAttribute = $reflectionMethod->getAttributes(RequireAuthentication::class);
-        $authenticatedUser = Luma::getLoggedInUser();
-
-        if (!empty($requireAuthenticationAttribute)) {
-            if (!$authenticatedUser) {
-                return $this->notAllowedResponse();
-            }
-        }
-
-        $requireUnauthenticatedAttribute = $reflectionMethod->getAttributes(RequireUnauthenticated::class);
-
-        if (!empty($requireUnauthenticatedAttribute)) {
-            if ($authenticatedUser) {
-                return $this->notAllowedResponse();
-            }
-        }
-
-        $requireRolesAttribute = $reflectionMethod->getAttributes(RequireRoles::class);
-
-        if (!empty($requireRolesAttribute)) {
-            if (!$authenticatedUser) {
-                return $this->notAllowedResponse();
-            }
-
-            $roles = $requireRolesAttribute[0]->getArguments()[0];
-
-            foreach ($roles as $role) {
-                if (!$authenticatedUser->hasRole($role)) {
-                    return $this->notAllowedResponse();
-                }
-            }
-        }
-
-        $requirePermissionsAttribute = $reflectionMethod->getAttributes(RequirePermissions::class);
-
-        if (!empty($requirePermissionsAttribute)) {
-            if (!$authenticatedUser) {
-                return $this->notAllowedResponse();
-            }
-
-            $permissions = $requirePermissionsAttribute[0]->getArguments()[0];
-
-            foreach ($authenticatedUser->getRoles() as $role) {
-                foreach ($permissions as $permission) {
-                    if (!$role->hasPermission($permission)) {
-                        return $this->notAllowedResponse();
-                    }
-                }
-            }
+        if ($notAllowedResponse instanceof ResponseInterface) {
+            return $notAllowedResponse;
         }
 
         if ($this->methodHasRequestParameter($controller, $methodName)) {
@@ -309,6 +262,24 @@ class Router {
     }
 
     /**
+     * @param string|null $redirectPath
+     * @param string|null $message
+     *
+     * @return void
+     */
+    private function checkForRedirect(?string $redirectPath, ?string $message): void
+    {
+        if ($message) {
+            $_SESSION['messages']['info'][] = $message;
+        }
+
+        if ($redirectPath) {
+            header('Location: ' . $redirectPath);
+            exit;
+        }
+    }
+
+    /**
      * @param $controller
      * @param string $methodName
      *
@@ -339,6 +310,161 @@ class Router {
 
             return array_key_exists(RequestInterface::class, $interfaces);
         }, $reflectionMethod->getParameters())));
+    }
+
+    /**
+     * @param $controller
+     * @param string $methodName
+     *
+     * @return Response|null
+     *
+     * @throws \ReflectionException
+     */
+    private function handleRouteProtectionAttributes($controller, string $methodName): ?Response
+    {
+        $reflectionMethod = new \ReflectionMethod($controller, $methodName);
+        $authenticatedUser = Luma::getLoggedInUser();
+
+        if ($requireAuthentication = $this->processRequireAuthenticationAttribute($reflectionMethod, $authenticatedUser)) {
+            return $requireAuthentication;
+        }
+
+        if ($requireUnauthenticated = $this->processRequireUnauthenticatedAttribute($reflectionMethod, $authenticatedUser)) {
+            return $requireUnauthenticated;
+        }
+
+        if ($requireRoles = $this->processRequireRolesAttribute($reflectionMethod, $authenticatedUser)) {
+            return $requireRoles;
+        }
+
+        if ($requirePermissions = $this->processRequirePermissionsAttribute($reflectionMethod, $authenticatedUser)) {
+            return $requirePermissions;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \ReflectionMethod $reflectionMethod
+     * @param UserInterface|null $authenticatedUser
+     *
+     * @return Response|null
+     */
+    private function processRequireAuthenticationAttribute(\ReflectionMethod $reflectionMethod, ?UserInterface $authenticatedUser): ?Response
+    {
+        $requireAuthenticationAttribute = $reflectionMethod->getAttributes(RequireAuthentication::class);
+
+        if (!empty($requireAuthenticationAttribute)) {
+            if (!$authenticatedUser) {
+                $this->checkForRedirect(
+                    $requireAuthenticationAttribute[0]->getArguments()[0] ?? null,
+                    $requireAuthenticationAttribute[0]->getArguments()[1] ?? null
+                );
+
+                return $this->notAllowedResponse();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \ReflectionMethod $reflectionMethod
+     * @param UserInterface|null $authenticatedUser
+     *
+     * @return Response|null
+     */
+    private function processRequireUnauthenticatedAttribute(\ReflectionMethod $reflectionMethod, ?UserInterface $authenticatedUser): ?Response
+    {
+        $requireUnauthenticatedAttribute = $reflectionMethod->getAttributes(RequireUnauthenticated::class);
+
+        if (!empty($requireUnauthenticatedAttribute)) {
+            if ($authenticatedUser) {
+                $this->checkForRedirect(
+                    $requireUnauthenticatedAttribute[0]->getArguments()[0] ?? null,
+                    $requireUnauthenticatedAttribute[0]->getArguments()[1] ?? null
+                );
+
+                return $this->notAllowedResponse();
+            }
+        }
+
+        return null;
+    }
+
+    private function processRequireRolesAttribute(\ReflectionMethod $reflectionMethod, ?UserInterface $authenticatedUser): ?Response
+    {
+        $requireRolesAttribute = $reflectionMethod->getAttributes(RequireRoles::class);
+
+        if (!empty($requireRolesAttribute)) {
+            [$redirectPath, $message] = $this->getRequiredAttributeArguments($requireRolesAttribute);
+
+            if (!$authenticatedUser) {
+                $this->checkForRedirect($redirectPath, $message);
+
+                return $this->notAllowedResponse();
+            }
+
+            $roles = $requireRolesAttribute[0]->getArguments()[0];
+
+            foreach ($roles as $role) {
+                if (!$authenticatedUser->hasRole($role)) {
+                    $this->checkForRedirect($redirectPath, $message);
+
+                    return $this->notAllowedResponse();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \ReflectionMethod $reflectionMethod
+     * @param UserInterface|null $authenticatedUser
+     *
+     * @return Response|null
+     */
+    public function processRequirePermissionsAttribute(\ReflectionMethod $reflectionMethod, ?UserInterface $authenticatedUser): ?Response
+    {
+        $requirePermissionsAttribute = $reflectionMethod->getAttributes(RequirePermissions::class);
+
+        if (!empty($requirePermissionsAttribute)) {
+            [$redirectPath, $message] = $this->getRequiredAttributeArguments($requirePermissionsAttribute);
+
+            if (!$authenticatedUser) {
+                $this->checkForRedirect($redirectPath, $message);
+
+                return $this->notAllowedResponse();
+            }
+
+            $permissions = $requirePermissionsAttribute[0]->getArguments()[0];
+
+            foreach ($authenticatedUser->getRoles() as $role) {
+                foreach ($permissions as $permission) {
+                    if (!$role->hasPermission($permission)) {
+                        $this->checkForRedirect($redirectPath, $message);
+
+                        return $this->notAllowedResponse();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \ReflectionAttribute $attribute
+     *
+     * @return array
+     */
+    private function getRequiredAttributeArguments(\ReflectionAttribute $attribute): array
+    {
+        return [
+            $attribute[0]->getArguments()[1] ?? null,
+            $attribute->getArguments()[1] ?? null,
+        ];
     }
 
     /**
