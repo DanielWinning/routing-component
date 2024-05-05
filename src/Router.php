@@ -3,8 +3,10 @@
 namespace Luma\RoutingComponent;
 
 use Luma\Framework\Luma;
+use Luma\Framework\Messages\FlashMessage;
 use Luma\HttpComponent\Response;
 use Luma\HttpComponent\Stream;
+use Luma\RoutingComponent\Attribute\AbstractRouteProtectionAttribute;
 use Luma\RoutingComponent\Attribute\RequireAuthentication;
 use Luma\RoutingComponent\Attribute\RequirePermissions;
 use Luma\RoutingComponent\Attribute\RequireRoles;
@@ -270,7 +272,7 @@ class Router {
     private function checkForRedirect(?string $redirectPath, ?string $message): void
     {
         if ($message) {
-            $_SESSION['messages']['info'][] = $message;
+            $_SESSION['messages']['info'][] = new FlashMessage($message);
         }
 
         if ($redirectPath) {
@@ -357,8 +359,7 @@ class Router {
         if (!empty($requireAuthenticationAttribute)) {
             if (!$authenticatedUser) {
                 $this->checkForRedirect(
-                    $requireAuthenticationAttribute[0]->getArguments()[0] ?? null,
-                    $requireAuthenticationAttribute[0]->getArguments()[1] ?? null
+                    ...$this->getRedirectionAttributeArguments($requireAuthenticationAttribute[0])
                 );
 
                 return $this->notAllowedResponse();
@@ -381,8 +382,7 @@ class Router {
         if (!empty($requireUnauthenticatedAttribute)) {
             if ($authenticatedUser) {
                 $this->checkForRedirect(
-                    $requireUnauthenticatedAttribute[0]->getArguments()[0] ?? null,
-                    $requireUnauthenticatedAttribute[0]->getArguments()[1] ?? null
+                    ...$this->getRedirectionAttributeArguments($requireUnauthenticatedAttribute[0])
                 );
 
                 return $this->notAllowedResponse();
@@ -397,7 +397,7 @@ class Router {
         $requireRolesAttribute = $reflectionMethod->getAttributes(RequireRoles::class);
 
         if (!empty($requireRolesAttribute)) {
-            [$redirectPath, $message] = $this->getRequiredAttributeArguments($requireRolesAttribute);
+            [$redirectPath, $message] = $this->getRedirectionAttributeArguments($requireRolesAttribute);
 
             if (!$authenticatedUser) {
                 $this->checkForRedirect($redirectPath, $message);
@@ -405,7 +405,7 @@ class Router {
                 return $this->notAllowedResponse();
             }
 
-            $roles = $requireRolesAttribute[0]->getArguments()[0];
+            $roles = $requireRolesAttribute[0]->getArguments()[RequireRoles::ROLES_KEY];
 
             foreach ($roles as $role) {
                 if (!$authenticatedUser->hasRole($role)) {
@@ -430,7 +430,7 @@ class Router {
         $requirePermissionsAttribute = $reflectionMethod->getAttributes(RequirePermissions::class);
 
         if (!empty($requirePermissionsAttribute)) {
-            [$redirectPath, $message] = $this->getRequiredAttributeArguments($requirePermissionsAttribute);
+            [$redirectPath, $message] = $this->getRedirectionAttributeArguments($requirePermissionsAttribute);
 
             if (!$authenticatedUser) {
                 $this->checkForRedirect($redirectPath, $message);
@@ -438,7 +438,7 @@ class Router {
                 return $this->notAllowedResponse();
             }
 
-            $permissions = $requirePermissionsAttribute[0]->getArguments()[0];
+            $permissions = $requirePermissionsAttribute[0]->getArguments()[RequirePermissions::PERMISSIONS_KEY];
 
             foreach ($authenticatedUser->getRoles() as $role) {
                 foreach ($permissions as $permission) {
@@ -459,11 +459,11 @@ class Router {
      *
      * @return array
      */
-    private function getRequiredAttributeArguments(\ReflectionAttribute $attribute): array
+    private function getRedirectionAttributeArguments(\ReflectionAttribute $attribute): array
     {
         return [
-            $attribute[0]->getArguments()[1] ?? null,
-            $attribute->getArguments()[1] ?? null,
+            $attribute->getArguments()[AbstractRouteProtectionAttribute::REDIRECT_PATH_KEY] ?? null,
+            $attribute->getArguments()[AbstractRouteProtectionAttribute::MESSAGE_KEY] ?? null,
         ];
     }
 

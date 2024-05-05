@@ -76,4 +76,10 @@ class TestController
     {
         return 'Success';
     }
+
+    #[RequireUnauthenticated(redirectPath: '/', message: 'You must be signed out to view this page.')]
+    public function notAuthenticatedWithArgumentsSuccess(): string
+    {
+        return 'Success';
+    }
 }

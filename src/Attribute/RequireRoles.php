@@ -3,8 +3,10 @@
 namespace Luma\RoutingComponent\Attribute;
 
 #[\Attribute(\Attribute::TARGET_METHOD)]
-class RequireRoles
+class RequireRoles extends AbstractRouteProtectionAttribute
 {
+    public const string ROLES_KEY = 'roles';
+
     /**
      * @param array $roles
      * @param string|null $redirectPath
