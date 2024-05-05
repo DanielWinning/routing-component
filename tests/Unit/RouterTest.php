@@ -258,7 +258,7 @@ class RouterTest extends TestCase
     {
         $this->router->loadRoutes([
             [
-                'path' => '/',
+                'path' => '/test-1',
                 'handler' => [
                     TestController::class,
                     'notAuthenticated',
@@ -266,7 +266,7 @@ class RouterTest extends TestCase
             ],
         ]);
 
-        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/test-1')));
 
         $this->assertEquals('403 Not Allowed', $response->getBody()->getContents());
         $this->assertEquals(403, $response->getStatusCode());
@@ -281,7 +281,14 @@ class RouterTest extends TestCase
     {
         $this->router->loadRoutes([
             [
-                'path' => '/',
+                'path' => '/test-1',
+                'handler' => [
+                    TestController::class,
+                    'notAuthenticatedSuccess',
+                ],
+            ],
+            [
+                'path' => '/test-2',
                 'handler' => [
                     TestController::class,
                     'notAuthenticatedSuccess',
@@ -289,7 +296,12 @@ class RouterTest extends TestCase
             ],
         ]);
 
-        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/')));
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/test-1')));
+
+        $this->assertEquals('Success', $response->getBody()->getContents());
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->router->handleRequest($this->buildGetRequest($this->buildUri('/test-2')));
 
         $this->assertEquals('Success', $response->getBody()->getContents());
         $this->assertEquals(200, $response->getStatusCode());

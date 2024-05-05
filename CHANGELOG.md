@@ -1,5 +1,26 @@
 # Luma | Routing Component Changelog
 
+## [1.6.1] - 2024-05-05
+### Added
+- Using `AbstractRouteProtectionAttribute`
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- Fixed issue where route protection attributes were not respecting `redirectPath` and `message` arguments.
+
+### Security
+- N/A
+
+---
+
 ## [1.6.0] - 2024-05-05
 ### Added
 - Added `redirectPath` and `message` to route protection attributes
