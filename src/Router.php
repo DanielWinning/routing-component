@@ -392,12 +392,18 @@ class Router {
         return null;
     }
 
+    /**
+     * @param \ReflectionMethod $reflectionMethod
+     * @param UserInterface|null $authenticatedUser
+     *
+     * @return Response|null
+     */
     private function processRequireRolesAttribute(\ReflectionMethod $reflectionMethod, ?UserInterface $authenticatedUser): ?Response
     {
         $requireRolesAttribute = $reflectionMethod->getAttributes(RequireRoles::class);
 
         if (!empty($requireRolesAttribute)) {
-            [$redirectPath, $message] = $this->getRedirectionAttributeArguments($requireRolesAttribute);
+            [$redirectPath, $message] = $this->getRedirectionAttributeArguments($requireRolesAttribute[0]);
 
             if (!$authenticatedUser) {
                 $this->checkForRedirect($redirectPath, $message);
@@ -430,7 +436,7 @@ class Router {
         $requirePermissionsAttribute = $reflectionMethod->getAttributes(RequirePermissions::class);
 
         if (!empty($requirePermissionsAttribute)) {
-            [$redirectPath, $message] = $this->getRedirectionAttributeArguments($requirePermissionsAttribute);
+            [$redirectPath, $message] = $this->getRedirectionAttributeArguments($requirePermissionsAttribute[0]);
 
             if (!$authenticatedUser) {
                 $this->checkForRedirect($redirectPath, $message);

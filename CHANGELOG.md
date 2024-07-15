@@ -1,5 +1,26 @@
 # Luma | Routing Component Changelog
 
+## [1.6.2] - 2024-07-15
+### Added
+- N/A
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- Fixed critical issue with protected routes; `processRequireRolesAttribute` and `processRequirePermissionsAttribute`
+
+### Security
+- N/A
+
+---
+
 ## [1.6.1] - 2024-05-05
 ### Added
 - Using `AbstractRouteProtectionAttribute`
