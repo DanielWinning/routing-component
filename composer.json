@@ -23,7 +23,7 @@
     "psr/container": "^2.0",
     "symfony/yaml": "^6.3",
     "psr/http-message": "^2.0",
-    "lumax/security-component": "^1.3",
+    "lumax/security-component": "dev-dev as 1.6.0",
     "lumax/http-component": "^2.2",
     "lumax/framework-component": "^1.0"
   },
