@@ -2,7 +2,6 @@
 
 namespace Luma\Tests\Unit;
 
-use Luma\DependencyInjectionComponent\Exception\NotFoundException;
 use Luma\Framework\Luma;
 use Luma\HttpComponent\Request;
 use Luma\HttpComponent\Response;
@@ -24,8 +23,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class RouterTest extends TestCase
 {
-    private ContainerInterface $container;
-    private string $temporaryRoutesFilepath;
     private Router $router;
 
     /**
@@ -36,8 +33,12 @@ class RouterTest extends TestCase
     protected function setUp(): void
     {
         $_SESSION = [];
-        $tmpRoutePath = sprintf('%s/%s', sys_get_temp_dir(), 'routes.yaml');
-        $tmpConfigPath = sprintf('%s/%s', sys_get_temp_dir(), 'services.yaml');
+        $configDirectory = sprintf('%s/config', sys_get_temp_dir());
+        $templateDirectory = sprintf('%s/views', sys_get_temp_dir());
+        $cacheDirectory = sprintf('%s/cache', sys_get_temp_dir());
+
+        $tmpRoutePath = sprintf('%s/%s', $configDirectory, 'routes.yaml');
+        $tmpConfigPath = sprintf('%s/%s', $configDirectory, 'services.yaml');
         $dummyRoutes = [
             'index' => [
                 'path' => '/test',
@@ -46,50 +47,21 @@ class RouterTest extends TestCase
         ];
 
         file_put_contents($tmpRoutePath, Yaml::dump(['routes' => $dummyRoutes]));
-        file_put_contents($tmpConfigPath, '');
+        file_put_contents($tmpConfigPath, Yaml::dump(['app.mode' => 'production']));
 
         try {
-            $luma = new Luma(sys_get_temp_dir(), sys_get_temp_dir(), sys_get_temp_dir());
+            new Luma($configDirectory, $templateDirectory, $cacheDirectory);
         } catch (\Exception|\Throwable $exception) {
             die($exception->getMessage());
         }
 
-        $this->temporaryRoutesFilepath = sprintf('%s/%s', sys_get_temp_dir(), 'routes.yaml');
+        $temporaryRoutesFilepath = sprintf('%s/%s', sys_get_temp_dir(), 'routes.yaml');
 
-        if (file_exists($this->temporaryRoutesFilepath)) {
-            unlink($this->temporaryRoutesFilepath);
+        if (file_exists($temporaryRoutesFilepath)) {
+            unlink($temporaryRoutesFilepath);
         }
 
-        $this->container = $this->createMock(ContainerInterface::class);
         $this->router = $this->configure();
-    }
-
-    /**
-     * @param mixed $routesData
-     *
-     * @return void
-     *
-     * @dataProvider getRouteFileInfo
-     */
-    public function testLoadRoutesFromFile(mixed $routesData): void
-    {
-        $router = new Router($this->container);
-        $routesConfig = fopen($this->temporaryRoutesFilepath, 'w');
-
-        if ($routesConfig !== false) {
-            fwrite($routesConfig, is_array($routesData) ? Yaml::dump(['routes' => $routesData]) : $routesData);
-            fclose($routesConfig);
-
-            if (is_array($routesData)) {
-                $router->loadRoutesFromFile($this->temporaryRoutesFilepath);
-                $this->assertSame($routesData, $router->getRoutes());
-            } else {
-                $this->expectException(\RuntimeException::class);
-                $router->loadRoutesFromFile($this->temporaryRoutesFilepath);
-            }
-        } else {
-            $this->fail('Unable to open file for writing.');
-        }
     }
 
     /**

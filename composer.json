@@ -23,7 +23,6 @@
     "psr/container": "^2.0",
     "symfony/yaml": "^6.3",
     "psr/http-message": "^2.0",
-    "lumax/security-component": "^1.3",
     "lumax/http-component": "^2.2",
     "lumax/framework-component": "^1.0"
   },
@@ -33,6 +32,6 @@
   "scripts": {
     "test": "php -d xdebug.mode=coverage ./vendor/bin/phpunit --testdox --colors=always --coverage-html coverage --coverage-clover coverage/coverage.xml --testdox-html coverage/testdox.html && npx badger --phpunit ./coverage/coverage.xml && npx badger --version ./composer.json && npx badger --license ./composer.json"
   },
-  "version": "1.6.2",
+  "version": "1.6.3",
   "license": "GPL-3.0-or-later"
 }
