@@ -1,5 +1,27 @@
 # Luma | Routing Component Changelog
 
+## [1.6.3] - 2024-11-19
+### Added
+- N/A
+
+### Changed
+- Update dependencies
+- No longer explicitly require `lumax/security-component` - required by `lumax/framework-component`
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- N/A
+
+### Security
+- N/A
+
+---
+
 ## [1.6.2] - 2024-07-15
 ### Added
 - N/A
